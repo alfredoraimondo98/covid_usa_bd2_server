@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const client = require('./utils/connection');
 
 //const bodyParser = require('body-parser');
 //app.use(bodyParser.json()); //application/json ??(is depecrated)
@@ -16,6 +17,29 @@ app.use(cors());
 //app.use('/auth', authRoutes);
  
 
+//Query
+async function query(){
+    //await client.connect();
+    await client.connect();
+    try{ 
+        const result = await client.db("basi2").collection("us_cities").findOne({ city: "New York" });
+                if (result) {
+                    console.log("query ok ");
+                    console.log(result);
+                } else {
+                    console.log("errore query");
+                }
+    
+    }catch(err){
+        console.log(err);
+    } finally {
+        await client.close();
+    }
+}
 
- 
+
+query().catch("err");
+
+
+
 app.listen(3000, () => console.log("server start"));
