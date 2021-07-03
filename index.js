@@ -11,15 +11,18 @@ app.use(express.json());
 const cors = require('cors');
 app.use(cors());
 
-//const authRoutes = require ('./routes/auth');
-
-
-//app.use('/auth', authRoutes);
+const clearRoutes = require ('./routes/clear');
+app.use('/clear', clearRoutes);
  
 
-//Query
+
+const integrationRoutes = require ('./routes/integration');
+app.use('/integration', integrationRoutes);
+ 
+
+//Query 
+/*
 async function query(){
-    //await client.connect();
     await client.connect();
     try{ 
         const result = await client.db("basi2").collection("us_cities").findOne({ city: "New York" });
@@ -39,7 +42,7 @@ async function query(){
 
 
 query().catch("err");
-
+*/
 
 
 app.listen(3000, () => console.log("server start"));
