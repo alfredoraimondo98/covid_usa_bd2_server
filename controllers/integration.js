@@ -65,6 +65,7 @@ exports.integrationCitiesAirQuality = async () => {
     });
 
     console.log("ritorno ARRAYINTEGRATION", arrayIntegration);
+    return arrayIntegration;
 }
 
 
@@ -73,9 +74,16 @@ exports.integrationCitiesAirQuality = async () => {
 
 /**
  * integra us_covid e lockdown_us
- * 
+ * NB. in lockdown_us non tutte le entry possiedono sia State che County.
  * Es JSON
- *  
+ *  {
+*       date: '2020-02-07',
+        county: 'Maricopa',
+        state: 'Arizona',
+        cases: '1',
+        deaths: '0.0',
+        type : 'Stay at home'
+ *  }
  * 
  */
     exports.integrationCovidLockdownUS = async () => {
@@ -87,7 +95,6 @@ exports.integrationCitiesAirQuality = async () => {
        var promiseCovidData = clearController.selectAllCovidData();
        const resultCovidData = await promiseCovidData; //dati ripuliti di lockdown
         
-        var arrayIntegration = new Map();
         newCollection = [];
 
         var risultatoPromise;
@@ -107,43 +114,40 @@ exports.integrationCitiesAirQuality = async () => {
                                 if(err) throw err;
                                 console.log("***IIIII*", resultCovid[0]);
                                 //Se viene trovata una corrispondenza, riporta state e county nell'oggetto air_quality
-                                if(resultCovid[0] != undefined){ //match per county
-                                    entry = {
-                                        _id : resultCovid[0]._id, 
-                                        date : elementLockdown.Date,
-                                        state : elementLockdown.State,
-                                        type : elementLockdown.Type,
-                                        county : resultCovid[0].county,
-                                        cases : resultCovid[0].cases,
-                                        deaths : resultCovid[0].deaths,
-                                    } 
-                                    console.log("ENTRYYYYYYYYYYYYY", entry);
-                                    resolve(entry); //resolve -> restituisce come risultato della promise la entry appena creata
-
+                                if(resultCovid[0] != undefined && elementLockdown.State == resultCovid.state){ //verifica se matcha per stato
+                                    if(elementLockdown.County == resultCovid.county){ // Verifica se matcha anche per contea
+                                        entry = { //Crea entry con stato e contea
+                                            _id : resultCovid[0]._id, 
+                                            date : elementLockdown.Date,
+                                            state : elementLockdown.State,
+                                            type : elementLockdown.Type,
+                                            county : resultCovid[0].county,
+                                            cases : resultCovid[0].cases,
+                                            deaths : resultCovid[0].deaths,
+                                        } 
+                                        console.log("ENTRYYYYYY", entry);
+                                        resolve(entry); //resolve -> restituisce come risultato della promise la entry appena creata
+                                    }
+                                    else{ //Altrimenti crea entry solo con state
+                                        entry = {
+                                            _id : resultCovid[0]._id, 
+                                            date : elementLockdown.Date,
+                                            state : elementLockdown.State,
+                                            type : elementLockdown.Type,
+                                            cases : resultCovid[0].cases,
+                                            deaths : resultCovid[0].deaths,
+                                        } 
+                                        resolve(entry); 
+                                    }
                                 }
-                           /*     else if(resultCovid[0] != undefined  && resultCovid[0].state){ //match per state
-                                    entry = {
-                                        _id : resultCovid[0]._id, 
-                                        date : elementLockdown.Date,
-                                        state : elementLockdown.State,
-                                        type : elementLockdown.Type,
-                                        cases : resultCovid[0].cases,
-                                        deaths : resultCovid[0].deaths,
-                                    } 
-                                    resolve(entry); //resolve -> restituisce come risultato della promise la entry appena creata
-                                } */
                                 else{
                                     console.log("Nessuna corrispondenza trovata"); //Se non viene trovato nessun match per county/state
-                                    //reject(); //se non vi è alcuna corrispondenza
+                                    resolve(1); //se non vi è alcuna corrispondenza
                                 }
-                            })
-
-                        
-                            });
-                            
-                        };
+                            })                        
+                        });        
+                    };
             
-            //resolve(arrayIntegration); //assegna al resolve l'oggetto da ritornare alla risoluzione della promise    
 
             var actions = resultLockdownUS.map(risultatoPromise); //itera i risultati dei lockdown richiamando la funzione risultatoPromise, memorizzando in action le promise in pending
             var res = await Promise.all(actions); //esegue le promise ottenute, memorizznaod i risultati in res.
@@ -157,14 +161,13 @@ exports.integrationCitiesAirQuality = async () => {
                     if(elementCovid._id.equals(elementLockdown._id)){
                         console.log("SI IF", elementLockdown);
                         
-                      //  dbo.collection("lockdown51").insertOne(elementLockdown);
-                        newCollection.push({
+                        newCollection.push({ //crea entry con informazioni relative al lockdown
                             date : elementLockdown.date,
                             county : elementLockdown.county,
                             state : elementLockdown.state,
                             cases : elementLockdown.cases,
                             deaths : elementLockdown.deaths,
-                            type : elementLockdown.type
+                            type : elementLockdown.type //type lockdown
                         }); 
                         flag = false;
                     }
@@ -172,8 +175,7 @@ exports.integrationCitiesAirQuality = async () => {
                     }
                 });
                 if(flag){
-                   // dbo.collection("lockdown51").insertOne(elementCovid);
-                    newCollection.push({
+                    newCollection.push({ //crea entry senza informazioni lockdown
                         date : elementCovid.date,
                         county : elementCovid.county,
                         state : elementCovid.state,
@@ -185,36 +187,12 @@ exports.integrationCitiesAirQuality = async () => {
 
         
 
-            console.log("newCollection.size", newCollection);    
-            (await dbo.createCollection("lockdown100")).insertMany(newCollection) 
-           
-           // dbo.collection("lockdown33").insertOne(elementCovid);
-
-
-            
-        }); //Fine mongo.connect
-
+        console.log("newCollection.size", newCollection );    
+        (await dbo.createCollection("Covid&Lockdown")).insertMany(newCollection); 
+         
        
 
-                     //Sostituire i dati covid con quelli covid+lockdown
-            /*
-                                resultCovid.forEach(elementCovid =>{ 
-                                    if(arrayIntegration.get(elementCovid._id)){
-                                        elementCovid = arrayIntegration.get(elementCovid._id);
-                                        //console.log("** elementCovid", elementCovid)
-                                        dbo.collection("lockdown33").insertOne(elementCovid);
-
-                                    }
-                                //  dbo.collection("lockdown33").insertOne(elementCovid);
-                                });
-            */
-
-        
-        //await console.log("***** SIZE ", arrayIntegration.size);
-
-
-
-    
-    }
+    }); //Fine mongo.connect
+}
     
 
