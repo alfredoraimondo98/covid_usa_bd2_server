@@ -6,7 +6,10 @@ const integrationController = require("../controllers/integration");
 router.post('/integrationCitiesAirQuality', integrationController.integrationCitiesAirQuality);
 
 
-router.post('/', integrationController.integrationCovidLockdownUS);
+router.post('/integrationCovidLockdownUS', integrationController.integrationCovidLockdownUS);
+
+
+router.post('/', integrationController.integrationCovidLockdownAirQuality);
 
 
 
