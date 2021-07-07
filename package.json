@@ -22,6 +22,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongodb": "^3.6.9",
+    "multikeymap": "^1.0.0",
     "nodemon": "^2.0.9"
   }
 }

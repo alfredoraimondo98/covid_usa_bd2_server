@@ -16,7 +16,7 @@ exports.selectAllCovidData = async () => {
                 dbo.collection("us_counties_covid19_daily").find(query).toArray(async function(err, result){
 
                     if (err) throw err;
-                    console.log(result);
+                   // console.log(result);
                 //await dbo.createCollection("all_data3");
                 //await dbo.collection("all_data3").insertMany(result);
                     db.close();  
