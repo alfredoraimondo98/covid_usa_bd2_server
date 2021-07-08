@@ -1,6 +1,10 @@
 const express = require('express');
 const app = express();
 const client = require('./utils/connection');
+const airQuality = require('./routes/airquality');
+const covid19 = require('./routes/covid19');
+const integrationQuery = require('./routes/integrationQuery');
+const lockdown = require('./routes/lockdown');
 
 //const bodyParser = require('body-parser');
 //app.use(bodyParser.json()); //application/json ??(is depecrated)
@@ -14,11 +18,15 @@ app.use(cors());
 const clearRoutes = require ('./routes/clear');
 app.use('/clear', clearRoutes);
  
-
-
 const integrationRoutes = require ('./routes/integration');
 app.use('/integration', integrationRoutes);
  
+app.use('/airquality', airQuality);
+app.use('/covid19', covid19);
+app.use('/integrationQuery', integrationQuery);
+app.use('/lockdown', lockdown);
+
+
 
 //Query 
 /*
