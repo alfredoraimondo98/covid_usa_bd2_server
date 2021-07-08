@@ -590,7 +590,7 @@ var p = new Promise(async function (resolve) {  //Promise esterna per ritornare 
         // Aggiunta del type lockdown ai dati covid_us
         var cont = 0;
         res.forEach(elResult => { 
-            resultLockdownData.forEach(elLockdown => { cont++;
+            resultLockdownData.forEach(elLockdown => { 
                 var entry;
                 if(elLockdown.State == elResult.state && !elLockdown.County){
                     entry = {
@@ -751,10 +751,20 @@ exports.integrationCovidLockdownAirQuality = async () => {
     const resultCitiesAirQuality = await promiseCitiesAirQuality; //dati ripuliti di Cities&Air
 
     var citiesAirMap = new MultiKeyMap();
+    var flag;
     resultCitiesAirQuality.forEach( el => {
+        flag = true;
         if(citiesAirMap.get( [el.date, el.county, el.state ] )){ 
             var array = citiesAirMap.get( [el.date, el.county, el.state ] );
-            array.push(el);
+            //Verifica la presenza di città duplicate
+            array.forEach(elDuplicate => {
+                if(elDuplicate.city == el.city){
+                    flag = false;
+                }
+            })
+            if(flag){ //se non sono stati trovati duplicati, inserisce l'elemento nell'array
+                array.push(el);
+            }
             citiesAirMap.set( [el.date, el.county, el.state ], array); //date , city, county, state
         }
         else{
@@ -762,7 +772,7 @@ exports.integrationCovidLockdownAirQuality = async () => {
         }
     })
 
-    console.log(" *** CITI AIR ", citiesAirMap.get( ['2020-02-11', 'San Diego', 'California'] ));
+  //  console.log(" *** CITI AIR ", citiesAirMap.get( ['2020-02-11', 'San Diego', 'California'] ));
 
     //console.log("**** RESULT COVID LOCK ", resultCitiesAirQuality)
     //console.log("****MAPPA AIR ", citiesAirMap);
@@ -869,7 +879,7 @@ exports.integrationCovidLockdownAirQuality = async () => {
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
         var dbo = db.db("basi2");
-        (await dbo.createCollection("ProvaFinale5")).insertMany(data); //Crea la collezione
+        (await dbo.createCollection("integrazioneFinale")).insertMany(data); //Crea la collezione
         //db.close();
     } )
 

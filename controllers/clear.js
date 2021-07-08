@@ -20,8 +20,33 @@ exports.selectAllCovidData = async () => {
                 //await dbo.createCollection("all_data3");
                 //await dbo.collection("all_data3").insertMany(result);
                     db.close();  
+                    arrayResult = [];
 
-                    resolve(result); //assegna al resolve l'oggetto da ritornare alla risoluzione della promise     
+                    result.forEach( elCovid => {
+                        if(elCovid.county == "Unknown"){ //elimina county dove county  = unknown
+                            arrayResult.push({
+                                _id : elCovid._id,
+                                date : elCovid.date,
+                                state : elCovid.state,
+                                cases : elCovid.cases,
+                                deaths  :elCovid.deaths
+                            })
+                        }
+                        else{
+                            if(elCovid.state == "Puerto Rico" && elCovid.date == "2020-03-15"){
+                                console.log("**** PUERTO RICO", elCovid)
+                            }
+                            arrayResult.push({
+                                _id : elCovid._id,
+                                date : elCovid.date,
+                                county : elCovid.county,
+                                state : elCovid.state,
+                                cases : elCovid.cases,
+                                deaths  :elCovid.deaths
+                            })
+                        }
+                    })
+                    resolve(arrayResult); //assegna al resolve l'oggetto da ritornare alla risoluzione della promise     
                 
                 });
             });
