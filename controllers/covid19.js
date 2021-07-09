@@ -16,8 +16,7 @@ exports.getCovidData = async (req, res, next) => {
  
 
 //***FASE 1: PROIEZIONE */
-    //Creazione proiezione
-
+    //Creazione proiezione 
     var projection = {};
     proiezione.forEach( elProject => {
 
