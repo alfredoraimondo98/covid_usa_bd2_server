@@ -10,7 +10,7 @@ router.post('/integrationCitiesAirQuality', integrationController.integrationCit
 router.post('/integrationCovidLockdownUS', integrationController.integrationCovidLockdownUS);
 
 
-router.post('/', integrationController.integrationCovidLockdownAirQuality);
+router.post('/integrationCovidLockdownAirQuality', integrationController.integrationCovidLockdownAirQuality);
 
 
 

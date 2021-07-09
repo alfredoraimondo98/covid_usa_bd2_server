@@ -1,6 +1,1 @@
 
-exports.selectAllCovidData = async () => {
-
-
-
-}

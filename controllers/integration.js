@@ -813,7 +813,7 @@ exports.integrationCovidLockdownAirQuality = async () => {
                 arrayCityAir.forEach(elCityAir => { 
                     elementCityAir.push({
                         city : elCityAir.city,
-                        air_quality : elCityAir.value_air 
+                        air_quality : parseFloat(elCityAir.value_air)
                     })
                 })
 
@@ -823,8 +823,8 @@ exports.integrationCovidLockdownAirQuality = async () => {
                         date : covidLockdown.date,
                         county : covidLockdown.county,
                         state: covidLockdown.state,
-                        cases : covidLockdown.cases,
-                        deaths: covidLockdown.deaths,
+                        cases : parseInt(covidLockdown.cases),
+                        deaths: parseInt(covidLockdown.deaths),
                         lockdown : covidLockdown.type,
                         cities_air_quality : elementCityAir
                     }                            
@@ -838,8 +838,8 @@ exports.integrationCovidLockdownAirQuality = async () => {
                         date : covidLockdown.date,
                         county : covidLockdown.county,
                         state: covidLockdown.state,
-                        cases : covidLockdown.cases,
-                        deaths: covidLockdown.deaths,
+                        cases : parseInt(covidLockdown.cases),
+                        deaths: parseInt(covidLockdown.deaths),
                         cities_air_quality : elementCityAir
 
 
@@ -853,8 +853,8 @@ exports.integrationCovidLockdownAirQuality = async () => {
                     date : covidLockdown.date,
                     county : covidLockdown.county,
                     state: covidLockdown.state,
-                    cases : covidLockdown.cases,
-                    deaths: covidLockdown.deaths,
+                    cases : parseInt(covidLockdown.cases),
+                    deaths: parseInt(covidLockdown.deaths),
                     lockdown : covidLockdown.type
                 });
             }
@@ -863,8 +863,8 @@ exports.integrationCovidLockdownAirQuality = async () => {
                     date : covidLockdown.date,
                     county : covidLockdown.county,
                     state: covidLockdown.state,
-                    cases : covidLockdown.cases,
-                    deaths: covidLockdown.deaths,
+                    cases : parseInt(covidLockdown.cases),
+                    deaths: parseInt(covidLockdown.deaths),
                 });
             }
         }

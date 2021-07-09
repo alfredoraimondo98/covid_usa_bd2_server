@@ -5,6 +5,7 @@ const airQuality = require('./routes/airquality');
 const covid19 = require('./routes/covid19');
 const integrationQuery = require('./routes/integrationQuery');
 const lockdown = require('./routes/lockdown');
+const homepage = require('./routes/homepage');
 
 //const bodyParser = require('body-parser');
 //app.use(bodyParser.json()); //application/json ??(is depecrated)
@@ -25,6 +26,7 @@ app.use('/airquality', airQuality);
 app.use('/covid19', covid19);
 app.use('/integrationQuery', integrationQuery);
 app.use('/lockdown', lockdown);
+app.use('/homepage', homepage);
 
 
 
