@@ -20,9 +20,9 @@ exports.getState = async (req, res, next) => {
                     "$group": {
                         "_id": "$state",
                         
-                    }
+                    },
                 }
-            ]).toArray(async function(err, result) {
+            ]).sort({_id : 1 }).toArray(async function(err, result) {
 
             if(err) throw err;
             //console.log(result);
@@ -64,7 +64,7 @@ exports.getCounty = async (req, res, next) => {
                         
                     }
                 }
-            ]).toArray(async function(err, result) {
+            ]).sort({_id : 1 }).toArray(async function(err, result) {
 
             if(err) throw err;
             console.log(result);
@@ -109,7 +109,7 @@ exports.getCounty = async (req, res, next) => {
                         
                     }
                 }
-            ]).toArray(async function(err, result) {
+            ]).sort({_id : 1 }).toArray(async function(err, result) {
 
             if(err) throw err;
             console.log(result);
@@ -126,7 +126,7 @@ exports.getCounty = async (req, res, next) => {
             })
             
             return res.status(201).json({
-                county : arrayCity
+                city : arrayCity
             })
             
         });
