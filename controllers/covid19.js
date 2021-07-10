@@ -1,5 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+//const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" //CLOUD URL
 
 /**
  * Effettua query su dati covid19
@@ -34,7 +35,7 @@ exports.getCovidData = async (req, res, next) => {
 
     })
 
-    console.log(" PROJ ", projection)
+    //console.log(" PROJ ", projection)
 
 
   
@@ -69,8 +70,8 @@ exports.getCovidData = async (req, res, next) => {
         
         if(condizioni[1].byDataInizio && condizioni[2].byDataFine){
             condition['date'] = {
-                    $gt : condizioni[1].byDataInizio,
-                    $lt : condizioni[2].byDataFine
+                    $gte : condizioni[1].byDataInizio,
+                    $lte : condizioni[2].byDataFine
             }
         }
         else{ 
@@ -99,7 +100,7 @@ exports.getCovidData = async (req, res, next) => {
     }
    ] */
 
-    console.log(" *** ", specializzazioni)
+    //console.log(" *** ", specializzazioni)
 
     if(specializzazioni[0].byCasiCovid){ //condizioni aggiuntive sui "casi covid"
         if(specializzazioni[0].byCasiCovid.start && specializzazioni[0].byCasiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
@@ -153,9 +154,15 @@ exports.getCovidData = async (req, res, next) => {
 
             db.close();
 
-            return res.status(201).json({
-                result : result
-            })
+            if(result.length > 0){ 
+                return res.status(201).json({
+                    result : result
+                })
+            }
+            else{
+                return res.status(204).json({})
+            }
+           
             
         });  
     })
