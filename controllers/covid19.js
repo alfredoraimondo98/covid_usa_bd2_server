@@ -146,9 +146,9 @@ exports.getCovidData = async (req, res, next) => {
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
-        var dbo = db.db("Basi2");
+        var dbo = db.db("basi2");
 
-        dbo.collection("integrazione").find(condition).project(projection).toArray(async function(err, result) {
+        dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
             if(err) throw err;
             console.log(result);
 
