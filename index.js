@@ -6,6 +6,7 @@ const covid19 = require('./routes/covid19');
 const integrationQuery = require('./routes/integrationQuery');
 const lockdown = require('./routes/lockdown');
 const homepage = require('./routes/homepage');
+//var MongoClient = require('mongodb').MongoClient;
 
 //const bodyParser = require('body-parser');
 //app.use(bodyParser.json()); //application/json ??(is depecrated)
@@ -30,6 +31,14 @@ app.use('/homepage', homepage);
 
 
 
+//Connessione to atlas cloud
+const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+/*MongoClient.connect(url, async function(err, db) {
+    if (err) throw err;
+
+    console.log("conn")
+})
+*/
 //Query 
 /*
 async function query(){
@@ -53,6 +62,7 @@ async function query(){
 
 query().catch("err");
 */
+
 
 
 app.listen(3000, () => console.log("server start"));
