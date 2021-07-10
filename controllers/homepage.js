@@ -73,7 +73,7 @@ exports.getCounty = async (req, res, next) => {
 
 
             result.forEach( el => {
-                if(el_id != null && el_id != 'Unknown'){ 
+                if(el._id != null && el._id != 'Unknown'){ 
                     arrayCounty.push(el._id)
                 }
             })
