@@ -4,4 +4,7 @@ const lockdownController = require("../controllers/lockdown");
 
 
 
+router.post('/', lockdownController.getLockdownData);
+
+
 module.exports = router;
