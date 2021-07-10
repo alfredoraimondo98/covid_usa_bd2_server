@@ -5,6 +5,7 @@ const {MongoClient} = require('mongodb');
 //uri di connessione a mongo
 const uri = "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 
+
 const client = new MongoClient(uri);
 
 

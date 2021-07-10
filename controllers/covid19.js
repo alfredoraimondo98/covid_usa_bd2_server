@@ -1,6 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
-//const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" //CLOUD URL
+//const url = "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" //CLOUD URL
 
 /**
  * Effettua query su dati covid19
@@ -146,9 +146,9 @@ exports.getCovidData = async (req, res, next) => {
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
-        var dbo = db.db("basi2");
+        var dbo = db.db("Basi2");
 
-        dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
+        dbo.collection("integrazione").find(condition).project(projection).toArray(async function(err, result) {
             if(err) throw err;
             console.log(result);
 
