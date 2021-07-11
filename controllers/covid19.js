@@ -8,7 +8,7 @@ const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDa
 exports.getCovidData = async (req, res, next) => {
     let proiezione = [];
     let condizioni;
-    let specializzazioni = [];
+    let specializzazioni;
   
     console.log("**** body ", req.body);
     console.log("***+ condizioni ", req.body.condizioni);
@@ -103,41 +103,41 @@ exports.getCovidData = async (req, res, next) => {
 
     //console.log(" *** ", specializzazioni)
 
-    if(specializzazioni[0].byCasiCovid){ //condizioni aggiuntive sui "casi covid"
-        if(specializzazioni[0].byCasiCovid.start && specializzazioni[0].byCasiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
+    if(specializzazioni.byCasiCovid){ //condizioni aggiuntive sui "casi covid"
+        if(specializzazioni.byCasiCovid.start && specializzazioni.byCasiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
             condition['cases'] = {
-                $gte : +specializzazioni[0].byCasiCovid.start,
-                $lte : +specializzazioni[0].byCasiCovid.end
+                $gte : +specializzazioni.byCasiCovid.start,
+                $lte : +specializzazioni.byCasiCovid.end
             }
         }
-        else if(specializzazioni[0].byCasiCovid.start){ //se è definito solo lo start (maggiore di)
+        else if(specializzazioni.byCasiCovid.start){ //se è definito solo lo start (maggiore di)
                 condition['cases'] = {
-                    $gte : +specializzazioni[0].byCasiCovid.start,
+                    $gte : +specializzazioni.byCasiCovid.start,
                 }
             }
-            else if(specializzazioni[0].byCasiCovid.end){ //Se è definito solo l'end (minore di)
+            else if(specializzazioni.byCasiCovid.end){ //Se è definito solo l'end (minore di)
                 condition['cases'] = {
-                    $lte : +specializzazioni[0].byCasiCovid.end,
+                    $lte : +specializzazioni.byCasiCovid.end,
                 }
             }
     }
     
 
-    if(specializzazioni[1].byMortiCovid){ //condizioni aggiuntive sui "morti covid"
-        if(specializzazioni[1].byMortiCovid.start && specializzazioni[1].byMortiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
+    if(specializzazioni.byMortiCovid){ //condizioni aggiuntive sui "morti covid"
+        if(specializzazioni.byMortiCovid.start && specializzazioni.byMortiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
             condition['deaths'] = {
-                $gte : +specializzazioni[1].byMortiCovid.start,
-                $lte : +specializzazioni[1].byMortiCovid.end
+                $gte : +specializzazioni.byMortiCovid.start,
+                $lte : +specializzazioni.byMortiCovid.end
             }
         }
         else if(specializzazioni[1].byMortiCovid.start){ //se è definito solo lo start (maggiore di)
                 condition['cadeathsses'] = {
-                    $gte : +specializzazioni[1].byMortiCovid.start,
+                    $gte : +specializzazioni.byMortiCovid.start,
                 }
             }
-            else if(specializzazioni[1].byMortiCovid.end){ //Se è definito solo l'end (minore di)
+            else if(specializzazioni.byMortiCovid.end){ //Se è definito solo l'end (minore di)
                 condition['deaths'] = {
-                    $lte : +specializzazioni[1].byMortiCovid.end,
+                    $lte : +specializzazioni.byMortiCovid.end,
                 }
             }
     }
