@@ -69,17 +69,17 @@ exports.getCovidData = async (req, res, next) => {
         }
 
         
-        if(condizioni.byDataInizio && condizioni.byDataFine){
+        if(condizioni.byDataInizio != '' && condizioni.byDataFine != ''){
             condition['date'] = {
                     $gte : condizioni.byDataInizio,
                     $lte : condizioni.byDataFine
             }
         }
         else{ 
-            if(condizioni.byDataInizio){
+            if(condizioni.byDataInizio != ''){
                 condition['date'] = condizioni.byDataInizio;
             }
-            else if(condizioni.byDataFine){
+            else if(condizioni.byDataFine != ''){
                     condition['date'] = condizioni.byDataFine;
             }
         }
@@ -131,7 +131,7 @@ exports.getCovidData = async (req, res, next) => {
             }
         }
         else if(specializzazioni.byMortiCovid.start){ //se è definito solo lo start (maggiore di)
-                condition['cadeathsses'] = {
+                condition['deaths'] = {
                     $gte : +specializzazioni.byMortiCovid.start,
                 }
             }
@@ -148,6 +148,7 @@ exports.getCovidData = async (req, res, next) => {
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
         var dbo = db.db("basi2");
+
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
             if(err) throw err;
