@@ -44,7 +44,7 @@ exports.getCovidData = async (req, res, next) => {
 
 /**FASE 2: QUERY (CONDIZIONI) */
 
-/*  "condizioni" : [
+/*  "condizioni" : 
     {"searchBy" : {
       	"type" : "state",
       	"value" : "Florida"
@@ -52,7 +52,7 @@ exports.getCovidData = async (req, res, next) => {
     },
     {"byDataInizio" : "2020-03-08 "},
     {"byDataFine" :"2020-05-08 "}
-    ], */
+    , */
 
     var condition = {}
         //verifica il criterio di ricerca (State, County, City)
