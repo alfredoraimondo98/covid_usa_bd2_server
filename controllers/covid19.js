@@ -159,7 +159,7 @@ exports.getCovidData = async (req, res, next) => {
                 return res.status(201).json({
                     
                     
-                    //result : result
+                    result : result
                 })
             }
             else{
