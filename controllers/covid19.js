@@ -130,7 +130,7 @@ exports.getCovidData = async (req, res, next) => {
                 $lte : +specializzazioni.byMortiCovid.end
             }
         }
-        else if(specializzazioni[1].byMortiCovid.start){ //se è definito solo lo start (maggiore di)
+        else if(specializzazioni.byMortiCovid.start){ //se è definito solo lo start (maggiore di)
                 condition['cadeathsses'] = {
                     $gte : +specializzazioni.byMortiCovid.start,
                 }
