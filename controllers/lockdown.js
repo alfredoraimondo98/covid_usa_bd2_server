@@ -93,7 +93,7 @@ exports.getLockdownData = async (req, res, next) => {
 
    console.log(" *** ", specializzazioni)
 
-    if(specializzazioni.type_lockdown){ //condizioni aggiuntive sui "casi covid"
+    if(specializzazioni.type_lockdown != 'Nessuno'){ //condizioni aggiuntive sui "casi covid"
         condition['lockdown'] = specializzazioni.type_lockdown
     }
     

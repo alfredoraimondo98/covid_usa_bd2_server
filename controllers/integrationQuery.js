@@ -268,7 +268,7 @@ function specializzazioniAirQuality(specializzazioni, condition){
 
 
 function specializzazioniLockdown(specializzazioni, condition){
-    if(specializzazioni.type_lockdown){ //condizioni aggiuntive sui "casi covid"
+    if(specializzazioni.type_lockdown != 'Nessuno'){ //condizioni aggiuntive sui "casi covid"
         condition['lockdown'] = specializzazioni.type_lockdown
     }
 }
