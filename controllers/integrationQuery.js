@@ -164,16 +164,16 @@ exports.getAllData = async (req, res, next) => {
 
     
 
-    if(req.body.typeQuery = 'covid19'){
+   // if(req.body.typeQuery = 'covid19'){
         specializzazioniCovid(specializzazioni, condition)
-    }
-    if(req.body.typeQuery = 'lockdown'){
+    //}
+    //if(req.body.typeQuery = 'lockdown'){
         specializzazioniLockdown(specializzazioni, condition);
 
-    }
-    if(req.body.typeQuery = 'airQuality'){
+    //}
+    //if(req.body.typeQuery = 'airQuality'){
         specializzazioniAirQuality(specializzazioni, condition);
-    }
+    //}
 
     console.log("condition " , condition);
 
