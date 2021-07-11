@@ -56,13 +56,13 @@ exports.getCovidData = async (req, res, next) => {
     var condition = {}
         //verifica il criterio di ricerca (State, County, City)
         if(condizioni[0].searchBy){
-            if(condizioni[0].searchBy.type == 'state'){
+            if(condizioni[0].searchBy.type == 'Stato' && condizioni[0].searchBy.value != 'Tutti' ){
                 condition['state'] = condizioni[0].searchBy.value;
             }
-            else if(condizioni[0].searchBy.type == 'county'){
+            else if(condizioni[0].searchBy.type == 'Contea' && condizioni[0].searchBy.value != 'Tutti'){
                 condition['county'] = condizioni[0].searchBy.value;
             }
-            else if(condizioni[0].searchBy.type == 'city'){
+            else if(condizioni[0].searchBy.type == 'Città' && condizioni[0].searchBy.value != 'Tutti'){
                 condition['city'] = condizioni[0].searchBy.value;
             }
         }
