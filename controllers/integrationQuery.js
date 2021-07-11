@@ -7,8 +7,8 @@ const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDa
  */
 exports.getAllData = async (req, res, next) => {
     let proiezione = [];
-    let condizioni = [];
-    let specializzazioni = [];
+    let condizioni;
+    let specializzazioni;
   
 
     proiezione = req.body.proiezioni;
@@ -44,7 +44,7 @@ exports.getAllData = async (req, res, next) => {
 
 /**FASE 2: QUERY (CONDIZIONI) */
 
-/*  "condizioni" : [
+/*  "condizioni" : 
     {"searchBy" : {
       	"type" : "state",
       	"value" : "Florida"
@@ -52,35 +52,35 @@ exports.getAllData = async (req, res, next) => {
     },
     {"byDataInizio" : "2020-03-08 "},
     {"byDataFine" :"2020-05-08 "}
-    ], */
+    , */
 
     var condition = {}
         //verifica il criterio di ricerca (State, County, City)
-        if(condizioni[0].searchBy){
-            if(condizioni[0].searchBy.type == 'state'){
-                condition['state'] = condizioni[0].searchBy.value;
+        if(condizioni.searchBy){
+            if(condizioni.searchBy.type == 'Stato' && condizioni.searchBy.value != 'Tutti' ){
+                condition['state'] = condizioni.searchBy.value;
             }
-            else if(condizioni[0].searchBy.type == 'county'){
-                condition['county'] = condizioni[0].searchBy.value;
+            else if(condizioni.searchBy.type == 'Contea' && condizioni.searchBy.value != 'Tutti'){
+                condition['county'] = condizioni.searchBy.value;
             }
-            else if(condizioni[0].searchBy.type == 'city'){
-                condition['city'] = condizioni[0].searchBy.value;
+            else if(condizioni.searchBy.type == 'Città' && condizioni.searchBy.value != 'Tutti'){
+                condition['city'] = condizioni.searchBy.value;
             }
         }
 
         
-        if(condizioni[1].byDataInizio && condizioni[2].byDataFine){
+        if(condizioni.byDataInizio != '' && condizioni.byDataFine != ''){
             condition['date'] = {
-                    $gte : condizioni[1].byDataInizio,
-                    $lte : condizioni[2].byDataFine
+                    $gte : condizioni.byDataInizio,
+                    $lte : condizioni.byDataFine
             }
         }
         else{ 
-            if(condizioni[1].byDataInizio){
-                condition['date'] = condizioni[1].byDataInizio;
+            if(condizioni.byDataInizio != ''){
+                condition['date'] = condizioni.byDataInizio;
             }
-            else if(condizioni[2].byDataFine){
-                    condition['date'] = condizioni[2].byDataFine;
+            else if(condizioni.byDataFine != ''){
+                    condition['date'] = condizioni.byDataFine;
             }
         }
 
@@ -95,7 +95,7 @@ exports.getAllData = async (req, res, next) => {
     }, */
 
     //console.log(" *** ", specializzazioni)
-
+/*
     if(specializzazioni[0].air_quality){ //condizioni aggiuntive su qualità dell'aria
         if(specializzazioni[0].air_quality.start && specializzazioni[0].air_quality.end){ //Se entrambi i parametri (min, max) sono definiti
             condition['cities_air_quality.air_quality'] = {
@@ -160,10 +160,22 @@ exports.getAllData = async (req, res, next) => {
         condition['lockdown'] = specializzazioni[3].type_lockdown
     }
     
+    */
+
     
 
+    if(req.body.typeQuery = 'covid19'){
+        specializzazioniCovid(specializzazioni, condition)
+    }
+    if(req.body.typeQuery = 'lockdown'){
+        specializzazioniLockdown(specializzazioni, condition);
+
+    }
+    if(req.body.typeQuery = 'airQuality'){
+        specializzazioniAirQuality(specializzazioni, condition);
+    }
+
     console.log("condition " , condition);
-    
 
 
     MongoClient.connect(url, async function(err, db) {
@@ -187,4 +199,76 @@ exports.getAllData = async (req, res, next) => {
         });  
     })
 
+}
+
+
+function specializzazioniCovid(specializzazioni, condition){
+    if(specializzazioni.byCasiCovid){ //condizioni aggiuntive sui "casi covid"
+        if(specializzazioni.byCasiCovid.start && specializzazioni.byCasiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
+            condition['cases'] = {
+                $gte : +specializzazioni.byCasiCovid.start,
+                $lte : +specializzazioni.byCasiCovid.end
+            }
+        }
+        else if(specializzazioni.byCasiCovid.start){ //se è definito solo lo start (maggiore di)
+                condition['cases'] = {
+                    $gte : +specializzazioni.byCasiCovid.start,
+                }
+            }
+            else if(specializzazioni.byCasiCovid.end){ //Se è definito solo l'end (minore di)
+                condition['cases'] = {
+                    $lte : +specializzazioni.byCasiCovid.end,
+                }
+            }
+    }
+    
+
+    if(specializzazioni.byMortiCovid){ //condizioni aggiuntive sui "morti covid"
+        if(specializzazioni.byMortiCovid.start && specializzazioni.byMortiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
+            condition['deaths'] = {
+                $gte : +specializzazioni.byMortiCovid.start,
+                $lte : +specializzazioni.byMortiCovid.end
+            }
+        }
+        else if(specializzazioni.byMortiCovid.start){ //se è definito solo lo start (maggiore di)
+                condition['deaths'] = {
+                    $gte : +specializzazioni.byMortiCovid.start,
+                }
+            }
+            else if(specializzazioni.byMortiCovid.end){ //Se è definito solo l'end (minore di)
+                condition['deaths'] = {
+                    $lte : +specializzazioni.byMortiCovid.end,
+                }
+            }
+    }
+    
+}
+
+
+function specializzazioniAirQuality(specializzazioni, condition){
+    if(specializzazioni.air_quality){ //condizioni aggiuntive su qualità dell'aria
+        if(specializzazioni.air_quality.start && specializzazioni.air_quality.end){ //Se entrambi i parametri (min, max) sono definiti
+            condition['cities_air_quality.air_quality'] = {
+                $gte : +specializzazioni.air_quality.start,
+                $lte : +specializzazioni.air_quality.end
+            }
+        }
+        else if(specializzazioni.air_quality.start){ //se è definito solo lo start (maggiore di)
+                condition['cities_air_quality.air_quality'] = {
+                    $gte : +specializzazioni.air_quality.start,
+                }
+            }
+            else if(specializzazioni.air_quality.end){ //Se è definito solo l'end (minore di)
+                condition['cities_air_quality.air_quality'] = {
+                    $lte : +specializzazioni.air_quality.end,
+                }
+            }
+    }
+}
+
+
+function specializzazioniLockdown(specializzazioni, condition){
+    if(specializzazioni.type_lockdown){ //condizioni aggiuntive sui "casi covid"
+        condition['lockdown'] = specializzazioni.type_lockdown
+    }
 }

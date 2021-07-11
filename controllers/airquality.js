@@ -64,7 +64,7 @@ exports.getAirQualityData = async (req, res, next) => {
                 condition['county'] = condizioni.searchBy.value;
             }
             else if(condizioni.searchBy.type == 'Città' && condizioni.searchBy.value != 'Tutti'){
-                condition['city'] = condizioni.searchBy.value;
+                condition['cities_air_quality.city'] = condizioni.searchBy.value;
             }
         }
 
