@@ -10,7 +10,8 @@ exports.getCovidData = async (req, res, next) => {
     let condizioni = [];
     let specializzazioni = [];
   
-
+    console.log("**** body ", req.body);
+    console.log("***+ condizioni ", req.body.condizioni);
     proiezione = req.body.proiezioni;
     condizioni = req.body.condizioni;
     specializzazioni = req.body.specializzazioni;
