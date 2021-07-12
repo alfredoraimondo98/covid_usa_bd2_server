@@ -36,7 +36,16 @@ exports.getAirQualityData = async (req, res, next) => {
             else{
                 projection[elProject.field.toString()] = 0
             }
-        } //Altrienti per tutti gli altri valori si procede all'inserimento soltanto se checked = 1 (true)
+        }
+        else if(elProject.field == 'city' || elProject.field == 'cities_air_quality'){ //verifica la presenza di city || cities_air_quality nella proiezione
+            if(elProject.checked){
+                projection['cities_air_quality'] = 1;
+                projGroup['cities_air_quality'] = "$cities_air_quality";
+
+                condition['cities_air_quality'] = { $exists : true } //richiede che i campi non oggetto di condizione debbano esistere nel risultato della query 
+            }
+        }
+        //Altrienti per tutti gli altri valori si procede all'inserimento soltanto se checked = 1 (true)
         else if(elProject.checked){
            // group={}
             projection[elProject.field.toString()] = 1

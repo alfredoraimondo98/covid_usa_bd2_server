@@ -36,14 +36,22 @@ exports.getAllData = async (req, res, next) => {
             else{
                 projection[elProject.field.toString()] = 0
             }
-        } //Altrienti per tutti gli altri valori si procede all'inserimento soltanto se checked = 1 (true)
+        }
+        else if(elProject.field == 'city' || elProject.field == 'cities_air_quality'){ //verifica la presenza di city || cities_air_quality nella proiezione
+            if(elProject.checked){
+                projection['cities_air_quality'] = 1;
+                projGroup['cities_air_quality'] = "$cities_air_quality";
+
+                condition['cities_air_quality'] = { $exists : true } //richiede che i campi non oggetto di condizione debbano esistere nel risultato della query 
+            }
+        }
+        //Altrienti per tutti gli altri valori si procede all'inserimento soltanto se checked = 1 (true)
         else if(elProject.checked){
            // group={}
             projection[elProject.field.toString()] = 1
             projGroup[elProject.field.toString()] = "$"+elProject.field.toString();
     
-            condition[elProject.field.toString()] = { $exists : true } //richiede che i campi non oggetto di condizione debbano esistere nel risultato della query
-         
+            condition[elProject.field.toString()] = { $exists : true } //richiede che i campi non oggetto di condizione debbano esistere nel risultato della query 
         } 
 
     })
@@ -133,7 +141,7 @@ exports.getAllData = async (req, res, next) => {
             },
         ]).toArray(async function(err, result) {
             if(err) throw err;
-            console.log(result);
+            //console.log(result);
 
             db.close();
             
@@ -141,7 +149,7 @@ exports.getAllData = async (req, res, next) => {
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 resArray.push(el._id);
             })
-            console.log("resArray", resArray);
+            //console.log("resArray", resArray);
 
             if(resArray.length > 0){ 
                 return res.status(201).json({
