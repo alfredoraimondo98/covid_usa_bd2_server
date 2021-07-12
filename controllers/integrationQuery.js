@@ -139,7 +139,7 @@ exports.getAllData = async (req, res, next) => {
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 resArray.push(el._id);
             })
-
+            console.log("resArray", resArray)
             if(resArray.length > 0){ 
                 return res.status(201).json({
                     result : resArray
@@ -158,18 +158,18 @@ exports.getAllData = async (req, res, next) => {
 
 function specializzazioniCovid(specializzazioni, condition){
     if(specializzazioni.byCasiCovid){ //condizioni aggiuntive sui "casi covid"
-        if(specializzazioni.byCasiCovid.start && specializzazioni.byCasiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
+        if(specializzazioni.byCasiCovid.start != -1 && specializzazioni.byCasiCovid.end != -1){ //Se entrambi i parametri (min, max) sono definiti
             condition['cases'] = {
                 $gte : +specializzazioni.byCasiCovid.start,
                 $lte : +specializzazioni.byCasiCovid.end
             }
         }
-        else if(specializzazioni.byCasiCovid.start){ //se è definito solo lo start (maggiore di)
+        else if(specializzazioni.byCasiCovid.start != -1){ //se è definito solo lo start (maggiore di)
                 condition['cases'] = {
                     $gte : +specializzazioni.byCasiCovid.start,
                 }
             }
-            else if(specializzazioni.byCasiCovid.end){ //Se è definito solo l'end (minore di)
+            else if(specializzazioni.byCasiCovid.end != -1){ //Se è definito solo l'end (minore di)
                 condition['cases'] = {
                     $lte : +specializzazioni.byCasiCovid.end,
                 }
@@ -178,18 +178,18 @@ function specializzazioniCovid(specializzazioni, condition){
     
 
     if(specializzazioni.byMortiCovid){ //condizioni aggiuntive sui "morti covid"
-        if(specializzazioni.byMortiCovid.start && specializzazioni.byMortiCovid.end){ //Se entrambi i parametri (min, max) sono definiti
+        if(specializzazioni.byMortiCovid.start != -1 && specializzazioni.byMortiCovid.end != -1){ //Se entrambi i parametri (min, max) sono definiti
             condition['deaths'] = {
                 $gte : +specializzazioni.byMortiCovid.start,
                 $lte : +specializzazioni.byMortiCovid.end
             }
         }
-        else if(specializzazioni.byMortiCovid.start){ //se è definito solo lo start (maggiore di)
+        else if(specializzazioni.byMortiCovid.start != -1){ //se è definito solo lo start (maggiore di)
                 condition['deaths'] = {
                     $gte : +specializzazioni.byMortiCovid.start,
                 }
             }
-            else if(specializzazioni.byMortiCovid.end){ //Se è definito solo l'end (minore di)
+            else if(specializzazioni.byMortiCovid.end != -1){ //Se è definito solo l'end (minore di)
                 condition['deaths'] = {
                     $lte : +specializzazioni.byMortiCovid.end,
                 }
@@ -201,18 +201,18 @@ function specializzazioniCovid(specializzazioni, condition){
 
 function specializzazioniAirQuality(specializzazioni, condition){
     if(specializzazioni.air_quality){ //condizioni aggiuntive su qualità dell'aria
-        if(specializzazioni.air_quality.start && specializzazioni.air_quality.end){ //Se entrambi i parametri (min, max) sono definiti
+        if(specializzazioni.air_quality.start != -1 && specializzazioni.air_quality.end != -1){ //Se entrambi i parametri (min, max) sono definiti
             condition['cities_air_quality.air_quality'] = {
                 $gte : +specializzazioni.air_quality.start,
                 $lte : +specializzazioni.air_quality.end
             }
         }
-        else if(specializzazioni.air_quality.start){ //se è definito solo lo start (maggiore di)
+        else if(specializzazioni.air_quality.start != -1){ //se è definito solo lo start (maggiore di)
                 condition['cities_air_quality.air_quality'] = {
                     $gte : +specializzazioni.air_quality.start,
                 }
             }
-            else if(specializzazioni.air_quality.end){ //Se è definito solo l'end (minore di)
+            else if(specializzazioni.air_quality.end != -1){ //Se è definito solo l'end (minore di)
                 condition['cities_air_quality.air_quality'] = {
                     $lte : +specializzazioni.air_quality.end,
                 }
