@@ -6,6 +6,8 @@ const covid19 = require('./routes/covid19');
 const integrationQuery = require('./routes/integrationQuery');
 const lockdown = require('./routes/lockdown');
 const homepage = require('./routes/homepage');
+const chartsQuery = require('./routes/chartsQuery');
+
 //var MongoClient = require('mongodb').MongoClient;
 
 //const bodyParser = require('body-parser');
@@ -29,10 +31,13 @@ app.use('/integrationQuery', integrationQuery);
 app.use('/lockdown', lockdown);
 app.use('/homepage', homepage);
 
+app.use('/chartsQuery', chartsQuery);
 
 
 //Connessione to atlas cloud
 const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+
+
 /*MongoClient.connect(url, async function(err, db) {
     if (err) throw err;
 
