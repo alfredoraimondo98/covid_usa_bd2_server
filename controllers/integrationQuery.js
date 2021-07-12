@@ -141,7 +141,6 @@ exports.getAllData = async (req, res, next) => {
             },
         ]).toArray(async function(err, result) {
             if(err) throw err;
-            //console.log(result);
 
             db.close();
             
@@ -149,7 +148,7 @@ exports.getAllData = async (req, res, next) => {
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 resArray.push(el._id);
             })
-            //console.log("resArray", resArray);
+            console.log("resArray", resArray);
 
             if(resArray.length > 0){ 
                 return res.status(201).json({
