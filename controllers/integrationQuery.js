@@ -1,6 +1,9 @@
 var MongoClient = require('mongodb').MongoClient;
 //const url = "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" //CLOUD URL
+const specializzazioniController = require('./specializzazioni');
+
+
 
 /**
  * Effettua query su dati covid19
@@ -38,8 +41,7 @@ exports.getAllData = async (req, res, next) => {
            // group={}
             projection[elProject.field.toString()] = 1
             projGroup[elProject.field.toString()] = "$"+elProject.field.toString();
-            
-            
+    
             condition[elProject.field.toString()] = { $exists : true } //richiede che i campi non oggetto di condizione debbano esistere nel risultato della query
          
         } 
@@ -100,11 +102,11 @@ exports.getAllData = async (req, res, next) => {
   		}
     }, */
 
-    specializzazioniCovid(specializzazioni, condition); //Specializzazioni covid19
+    specializzazioniController.specializzazioniCovid(specializzazioni, condition); //Specializzazioni covid19
 
-    specializzazioniLockdown(specializzazioni, condition); //specializzazioni Lockdown
+    specializzazioniController.specializzazioniLockdown(specializzazioni, condition); //specializzazioni Lockdown
 
-    specializzazioniAirQuality(specializzazioni, condition); //Specializzazioni airQuality
+    specializzazioniController.specializzazioniAirQuality(specializzazioni, condition); //Specializzazioni airQuality
     
 
 
@@ -139,7 +141,8 @@ exports.getAllData = async (req, res, next) => {
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 resArray.push(el._id);
             })
-            console.log("resArray", resArray)
+            console.log("resArray", resArray);
+
             if(resArray.length > 0){ 
                 return res.status(201).json({
                     result : resArray
@@ -155,7 +158,7 @@ exports.getAllData = async (req, res, next) => {
 
 
 
-
+/*
 function specializzazioniCovid(specializzazioni, condition){
     if(specializzazioni.byCasiCovid){ //condizioni aggiuntive sui "casi covid"
         if(specializzazioni.byCasiCovid.start != -1 && specializzazioni.byCasiCovid.end != -1){ //Se entrambi i parametri (min, max) sono definiti
@@ -226,3 +229,5 @@ function specializzazioniLockdown(specializzazioni, condition){
         condition['lockdown'] = specializzazioni.type_lockdown
     }
 }
+
+*/
