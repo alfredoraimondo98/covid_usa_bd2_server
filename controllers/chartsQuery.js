@@ -1,7 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 //const url = "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 const url = "mongodb+srv://admin:admin@mongodb-basi2.vxnwa.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" //CLOUD URL
- 
+var dateFormat = require('dateformat'); 
 
 /**
  * restituisce un aggregazione dei casi/morti covid stato in un range di date
@@ -279,9 +279,19 @@ exports.getLockdown = (req, res, next) => {
 
             console.log(result);
 
+            //formattazione risposta
+            arrayResult = [];
+            result.forEach( rEl =>{
+                arrayResult.push({
+                    tipo : rEl.lockdown,
+                    data : rEl.date,
+                    contea : rEl.county
+                });
+            })
+
             if(result.length > 0){
                 return res.status(201).json({
-                    lockdown : result
+                    lockdown : arrayResult
                 })
             }
             else{
@@ -301,17 +311,29 @@ exports.getLockdown = (req, res, next) => {
  */
 exports.getReportCases = (req, res, next) => {
 
+    const range = 2;
     var state;
     var county;
     var date;
     var lockdown;
+    
+    var dateFormatted
+    var dateStart;
+    var dateEnd;
 
 
-    state = req.boyd.state;
+    state = req.body.state;
     county = req.body.county;
-    date = req.body.date;
+    date = new Date(req.body.date); //start ritorna all lockdown date
+    dateFormatted = dateFormat(new Date(req.body.date), "yyyy-mm-dd");
     lockdown = req.body.lockdown;
 
+    
+
+    dateStart = dateFormat(new Date(date - (6.048e+8 * range)), "yyyy-mm-dd");
+    dateEnd = dateFormat(new Date(date + (6.048e+8 * range)), "yyyy-mm-dd");
+
+    console.log("Start ", dateStart, "End ", dateEnd);
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
