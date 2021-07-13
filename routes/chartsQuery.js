@@ -5,5 +5,8 @@ const chartsQueryController = require("../controllers/chartsQuery");
 
 router.post('/getCasesAndDeaths', chartsQueryController.getCasesAndDeaths);
 
+router.post('/getCasesTwoStates', chartsQueryController.getCasesTwoStates);
+
+router.post('/getLockdown', chartsQueryController.getLockdown);
 
 module.exports = router;
