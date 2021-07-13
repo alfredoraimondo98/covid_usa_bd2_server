@@ -324,13 +324,15 @@ exports.getReportCases = (req, res, next) => {
 
     state = req.body.state;
     county = req.body.county;
-    date = new Date(req.body.date); //start ritorna all lockdown date
+    //date = new Date(req.body.date); //start ritorna all lockdown date
     dateFormatted = dateFormat(new Date(req.body.date), "yyyy-mm-dd");
     lockdown = req.body.lockdown;
 
     
-
+    date = new Date(req.body.date); 
     dateStart = dateFormat(new Date(date - (6.048e+8 * range)), "yyyy-mm-dd");
+
+    date = new Date(req.body.date); //start ritorna all lockdown date
     dateEnd = dateFormat(new Date(date + (6.048e+8 * range)), "yyyy-mm-dd");
 
     console.log("Start ", dateStart, "End ", dateEnd);

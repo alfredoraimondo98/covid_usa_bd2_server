@@ -9,4 +9,6 @@ router.post('/getCasesTwoStates', chartsQueryController.getCasesTwoStates);
 
 router.post('/getLockdown', chartsQueryController.getLockdown);
 
+router.post('/getReportCases', chartsQueryController.getReportCases);
+
 module.exports = router;
