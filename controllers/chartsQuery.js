@@ -270,7 +270,7 @@ exports.getLockdown = (req, res, next) => {
         var dbo = db.db("basi2");
 
         var condition = {"state" : state, "lockdown" : {$exists : true} };
-        var projection = { _id : 0, date : 1, lockdown : 1}
+        var projection = { _id : 0, date : 1, lockdown : 1, county: 1}
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
             if(err) throw err;      
