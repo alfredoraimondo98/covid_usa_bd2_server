@@ -13,4 +13,6 @@ router.post('/getReportCases', chartsQueryController.getReportCases);
 
 router.post('/getStateWithLockdown', chartsQueryController.getStateWithLockdown);
 
+router.post('/getReportAirQuality', chartsQueryController.getReportAirQuality);
+
 module.exports = router;

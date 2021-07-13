@@ -311,7 +311,6 @@ exports.getLockdown = (req, res, next) => {
  */
 exports.getReportCases = (req, res, next) => {
 
-    const range = 2;
     var state;
     var county;
     var date;
@@ -427,5 +426,80 @@ exports.getReportCases = (req, res, next) => {
 
         });
     })
+}
 
+
+/**
+ * report dati qualità dell'aria
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.getReportAirQuality = (req, res, next) => {
+    var state;
+    var county;
+    var date;
+    var lockdown;
+    
+    var dateFormatted;
+    var dateStartFormatted;
+    var dateEndFormatted;
+    var dateStart;
+    var dateEnd;
+
+
+    state = req.body.state;
+    county = req.body.county;
+    date = new Date(req.body.date); //start ritorna all lockdown date
+    dateFormatted = dateFormat(new Date(req.body.date), "yyyy-mm-dd");
+    lockdown = req.body.lockdown;
+  
+    //console.log("*** DATA RICHIESTA ", date, dateFormatted)
+  
+    console.log(date);
+
+    dateStart = new Date(req.body.date);
+    dateStart.setDate(date.getDate() - 15);
+    dateStartFormatted = dateFormat(dateStart, "yyyy-mm-dd");
+    //console.log("** START", dateStart, dateStartFormatted);
+
+    //console.log("**** ", date);
+    dateEnd = new Date(req.body.date);
+    dateEnd.setDate(date.getDate() + 15);
+    dateEndFormatted = dateFormat(dateEnd, "yyyy-mm-dd");
+    //console.log("** END ", dateEnd, dateEndFormatted);
+
+    
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+        var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
+        var projection = { _id : 0, date : 1, cities_air_quality: 1}
+
+        dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
+            if(err) throw err;      
+            
+            db.close();
+
+            console.log(result);
+            categories = [];
+            airQuality = [];
+
+            result.forEach(el => {
+                categories.push(el.date)
+                airQuality.push(el.cities_air_quality[0].air_quality);
+            })
+            if(result.length > 0){
+                return res.status(201).json({
+                    categories : categories,
+                    airQuality : airQuality
+                })
+            }
+            else{
+                return res.status(204).json({})
+            }  
+        });
+    });
 }
