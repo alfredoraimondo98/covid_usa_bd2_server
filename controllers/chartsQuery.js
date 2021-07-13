@@ -52,7 +52,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
         var dbo = db.db("basi2");
 
 
-        console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
+       // console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
         dbo.collection("integrazioneFinale").aggregate([
 
