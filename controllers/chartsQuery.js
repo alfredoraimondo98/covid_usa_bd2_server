@@ -43,7 +43,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
     }
 
     var projection = {"state" : 1, "date" : 1, "cases" : 1 , "deaths" : 1};
-    var projGroup = { "state" : "$state", "date" : "$date", cases: { $sum: "$cases" }, deaths: { $sum: "$deaths" }};
+    //var projGroup = { "_id" : {"state" : "$state", "date" : "$date"}, cases: { $sum: "$cases" }, deaths: { $sum: "$deaths" }};
 
    
 
@@ -64,8 +64,8 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             },
             {
                 "$group": { //groupby
-                    "_id": projGroup
-                }
+                    "_id" : {"state" : "$state", "date" : "$date"}, cases: { $sum: "$cases" }, deaths: { $sum: "$deaths" }}
+                
             }
         ]).sort({_id : 1}).toArray(async function(err, result) {
             if(err) throw err;
@@ -78,8 +78,8 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             let deathsArray = [];
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 categoriesArray.push(el._id.date);
-                casesArray.push(el._id.cases);
-                deathsArray.push(el._id.deaths);
+                casesArray.push(el.cases);
+                deathsArray.push(el.deaths);
             })
             //console.log("resArray", resArray);
 
@@ -317,43 +317,53 @@ exports.getReportCases = (req, res, next) => {
     var date;
     var lockdown;
     
-    var dateFormatted
+    var dateFormatted;
+    var dateStartFormatted;
+    var dateEndFormatted;
     var dateStart;
     var dateEnd;
 
 
     state = req.body.state;
     county = req.body.county;
-    //date = new Date(req.body.date); //start ritorna all lockdown date
+    date = new Date(req.body.date); //start ritorna all lockdown date
     dateFormatted = dateFormat(new Date(req.body.date), "yyyy-mm-dd");
     lockdown = req.body.lockdown;
+  
+    //console.log("*** DATA RICHIESTA ", date, dateFormatted)
+  
+    console.log(date);
+
+    dateStart = new Date(req.body.date);
+    dateStart.setDate(date.getDate() - 15);
+    dateStartFormatted = dateFormat(dateStart, "yyyy-mm-dd");
+    //console.log("** START", dateStart, dateStartFormatted);
+
+    //console.log("**** ", date);
+    dateEnd = new Date(req.body.date);
+    dateEnd.setDate(date.getDate() + 15);
+    dateEndFormatted = dateFormat(dateEnd, "yyyy-mm-dd");
+    //console.log("** END ", dateEnd, dateEndFormatted);
 
     
-    date = new Date(req.body.date); 
-    dateStart = dateFormat(new Date(date - (6.048e+8 * range)), "yyyy-mm-dd");
-
-    date = new Date(req.body.date); //start ritorna all lockdown date
-    dateEnd = dateFormat(new Date(date + (6.048e+8 * range)), "yyyy-mm-dd");
-
-    console.log("Start ", dateStart, "End ", dateEnd);
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
         var dbo = db.db("basi2");
 
-        var condition = {"state" : state, "lockdown" : {$exists : true} };
-        var projection = { _id : 0, date : 1, lockdown : 1, county: 1}
+        var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
+        var projection = { _id : 0, date : 1, cases : 1, deaths : 1, state: 1, county: 1}
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
             if(err) throw err;      
             
             db.close();
 
-            console.log(result);
+          //  console.log(result);
 
             if(result.length > 0){
                 return res.status(201).json({
-                    //lockdown : result
+                    report : result
                 })
             }
             else{
@@ -361,6 +371,4 @@ exports.getReportCases = (req, res, next) => {
             }  
         });
     });
-    
-
 }
