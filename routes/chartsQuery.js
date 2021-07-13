@@ -15,4 +15,7 @@ router.post('/getStateWithLockdown', chartsQueryController.getStateWithLockdown)
 
 router.post('/getReportAirQuality', chartsQueryController.getReportAirQuality);
 
+router.post('/getReportAirAverage', chartsQueryController.getReportAirAverage);
+
+
 module.exports = router;
