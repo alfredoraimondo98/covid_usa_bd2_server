@@ -544,7 +544,7 @@ exports.getReportAirAverage = (req, res, next) => {
     }
 
     condition['cities_air_quality'] = { "$exists" : true};
-    var projection = {"state" : 1, "cities_air_quality" : 1};
+    //var projection = {"state" : 1, "cities_air_quality" : 1};
     //var projGroup = { "_id" : {"state" : "$state", "date" : "$date"}, cases: { $sum: "$cases" }, deaths: { $sum: "$deaths" }};
     console.log("*** ", condition)
 
@@ -565,7 +565,7 @@ exports.getReportAirAverage = (req, res, next) => {
             /*{
                 "$project" : projection //project()
             }, */
-            {$unwind: "$cities_air_quality"},
+            {$unwind: "$cities_air_quality"}, //destruttura l'array cities_air_quality
             {
                 "$group": { //groupby
                     "_id" : {"state" : "$state", "county" : "$county", "city" : "$cities_air_quality.city"}, air_average: { $avg: "$cities_air_quality.air_quality" }}
