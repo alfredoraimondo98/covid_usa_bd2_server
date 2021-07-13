@@ -11,4 +11,6 @@ router.post('/getLockdown', chartsQueryController.getLockdown);
 
 router.post('/getReportCases', chartsQueryController.getReportCases);
 
+router.post('/getStateWithLockdown', chartsQueryController.getStateWithLockdown);
+
 module.exports = router;

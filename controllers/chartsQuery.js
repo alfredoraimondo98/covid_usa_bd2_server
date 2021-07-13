@@ -372,3 +372,60 @@ exports.getReportCases = (req, res, next) => {
         });
     });
 }
+
+
+
+/**
+ * restituisce la lista degli stati per i quali è presente il lockdown
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+ exports.getStateWithLockdown = (req, res, next) => {
+
+    var condition = { state : {"$exists" : true}, lockdown : {"$exists" : true} };
+    var projection = { _id : 0, state : 1}
+    var projGroup = {"state" : "$state", "lockdown" : "$lockdown"};
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+
+        console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
+
+
+        //query stato 1
+        dbo.collection("integrazioneFinale").aggregate([
+
+            {
+                "$match" :  condition  //find() 
+            },
+            {
+                "$project" : projection //project()
+            },
+            {
+                "$group": { //groupby
+                    "_id": projGroup
+                }
+            }
+        ]).sort({_id : 1}).toArray(async function(err, result) {
+            if(err) throw err;
+            console.log(result);
+
+            db.close();
+
+            arrayState = []
+            result.forEach( el => {
+                arrayState.push(el._id.state)
+            }) 
+
+
+            return res.status(201).json({
+                state : arrayState
+            })
+
+        });
+    })
+
+}
