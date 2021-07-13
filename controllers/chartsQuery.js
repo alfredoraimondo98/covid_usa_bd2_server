@@ -85,9 +85,9 @@ exports.getCasesAndDeaths = async (req, res, next) => {
 
             if(categoriesArray.length > 0){ 
                 return res.status(201).json({
-                    categories : categoriesArray,
-                    cases : casesArray,
-                    deaths : deathsArray
+                    qf_categories : categoriesArray,
+                    qf_cases : casesArray,
+                    qf_deaths : deathsArray
                 })
             }
             else{
@@ -289,4 +289,54 @@ exports.getLockdown = (req, res, next) => {
             }  
         });
     });
+}
+
+
+
+/**
+ * restituisce il report casi pre/post lockdown sulla base di uno stato di ricerca
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.getReportCases = (req, res, next) => {
+
+    var state;
+    var county;
+    var date;
+    var lockdown;
+
+
+    state = req.boyd.state;
+    county = req.body.county;
+    date = req.body.date;
+    lockdown = req.body.lockdown;
+
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+        var condition = {"state" : state, "lockdown" : {$exists : true} };
+        var projection = { _id : 0, date : 1, lockdown : 1, county: 1}
+
+        dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
+            if(err) throw err;      
+            
+            db.close();
+
+            console.log(result);
+
+            if(result.length > 0){
+                return res.status(201).json({
+                    //lockdown : result
+                })
+            }
+            else{
+                return res.status(204).json({})
+            }  
+        });
+    });
+    
+
 }
