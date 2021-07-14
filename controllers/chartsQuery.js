@@ -637,11 +637,18 @@ exports.getReportAirAverage = (req, res, next) => {
             console.log(result);
 
             db.close();
-    
+
+            var data = []; //Array dati formattati per il grafo
+            result.forEach(el => {
+                data.push({
+                    name : el._id.city,
+                    y : el.air_average
+                })
+            })
 
             if(result.length > 0){ 
                 return res.status(201).json({
-                    result : result
+                    result : data
                 })
             }
             else{
