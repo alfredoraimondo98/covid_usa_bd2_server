@@ -28,6 +28,14 @@ exports.getCasesAndDeaths = async (req, res, next) => {
 
     //Verifica la presenza del range temporale (data inzio - data fine)
     if(byDataInizio != '' && byDataFine != ''){
+
+        //costruisce data precedente a quella richiesta
+        var dateYesterday = new Date(byDataInizio);
+            dateYesterday.setDate(dateYesterday.getDate() - 1);
+            dateYesterday = dateFormat(dateYesterday , "yyyy-mm-dd");
+            byDataInizio = dateYesterday; //aggiona bydataInizio alla data precedente (yesterday)
+            
+
         condition['date'] = {
                 $gte : byDataInizio,
                 $lte : byDataFine
@@ -35,6 +43,12 @@ exports.getCasesAndDeaths = async (req, res, next) => {
     }
     else{ 
         if(byDataInizio != ''){
+            //costruisce data precedente a quella richiesta
+            var dateYesterday = new Date(byDataInizio);
+            dateYesterday.setDate(dateYesterday.getDate() - 1);
+            dateYesterday = dateFormat(dateYesterday , "yyyy-mm-dd");
+            byDataInizio = dateYesterday; //aggiona bydataInizio alla data precedente (yesterday)
+             
             condition['date'] = {"$gte" : byDataInizio};
         }
         else if(byDataFine != ''){
@@ -69,7 +83,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             }
         ]).sort({_id : 1}).toArray(async function(err, result) {
             if(err) throw err;
-            console.log(result);
+           // console.log(result);
 
             db.close();
         
@@ -142,6 +156,14 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             })
             //console.log("resArray", resArray);
 
+            
+            //elimina il primo elemento di ogni array costruito (corrispondente alla data yesterday)
+            if(byDataInizio != ''){
+                categoriesArray.shift();
+                casesArray.shift();
+                deathsArray.shift();
+                resultArray.shift();
+            }
             
 
             if(categoriesArray.length > 0){ 
