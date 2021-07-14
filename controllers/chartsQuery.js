@@ -92,11 +92,11 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                     sumDeaths = sumDeaths + el.deaths;
                 }
                 else{
-                    casesArray.push(el.cases - sumCases);
+                    //casesArray.push(el.cases - sumCases);
                     
                     var diffDeaths = el.deaths - sumDeaths;
                     var diffCases = el.cases - sumCases;
-                    if(diffDeaths < 0){
+                    if(diffDeaths < 0){ //Verifica la presenza di dati negativi per deaths
                         deathsArray.push(0);
                         deathsArray[i-1] = deathsArray[i-1] + diffDeaths;
                         sumDeaths = sumDeaths + diffDeaths;
@@ -106,7 +106,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                         sumDeaths = sumDeaths + deathsArray[i];
                     }
 
-                    if(diffCases < 0){   
+                    if(diffCases < 0){ //Verifica la presenza di dati negativi per cases
                         casesArray.push(0);
                         casesArray[i-1] = casesArray[i-1] + diffCases;
                         sumCases = sumCases + diffCases;
@@ -116,7 +116,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                         sumCases = sumCases + casesArray[i];
                     }
 
-                    sumCases = sumCases + casesArray[i];
+                    //sumCases = sumCases + casesArray[i];
                 }
                 i++;
 
