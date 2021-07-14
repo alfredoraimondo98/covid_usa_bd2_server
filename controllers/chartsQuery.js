@@ -75,7 +75,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
         
             let categoriesArray = []
             let casesArray = [];
-            let deathsArray = [];
+            var deathsArray = [];
             let resultArray = []; //array dati risposta per la visualizzazione della griglia
             var i=0;
             var sumCases = 0;
@@ -93,12 +93,32 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                 }
                 else{
                     casesArray.push(el.cases - sumCases);
-                    deathsArray.push(el.deaths - sumDeaths);
+                    
+                    var diffDeaths = el.deaths - sumDeaths;
+                    var diffCases = el.cases - sumCases;
+                    if(diffDeaths < 0){
+                        deathsArray.push(0);
+                        deathsArray[i-1] = deathsArray[i-1] + diffDeaths;
+                        sumDeaths = sumDeaths + diffDeaths;
+                    }
+                    else{
+                        deathsArray.push(el.deaths - sumDeaths);
+                        sumDeaths = sumDeaths + deathsArray[i];
+                    }
+
+                    if(diffCases < 0){   
+                        casesArray.push(0);
+                        casesArray[i-1] = casesArray[i-1] + diffCases;
+                        sumCases = sumCases + diffCases;
+                    }
+                    else{
+                        casesArray.push(el.cases - sumCases);
+                        sumCases = sumCases + casesArray[i];
+                    }
+
                     sumCases = sumCases + casesArray[i];
-                    sumDeaths = sumDeaths + deathsArray[i];
                 }
                 i++;
-
 
 
                 resultArray.push({
