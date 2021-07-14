@@ -706,16 +706,29 @@ exports.getReportAirAverage = (req, res, next) => {
             db.close();
 
             var data = []; //Array dati formattati per il grafo
+            var resultArray = [];
             result.forEach(el => {
                 data.push({
                     name : el._id.city,
                     y : el.air_average
                 })
+
+                resultArray.push({
+                    state : el._id.state,
+                    county : el._id.counyt,
+                    city : el._id.city,
+                    cities_air_quality : {
+                        city : el._id.city,
+                        air_quality : el.air_average
+                    }
+                })
+
             })
 
             if(result.length > 0){ 
                 return res.status(201).json({
-                    result : data
+                    data : data,
+                    result : resultArray
                 })
             }
             else{
