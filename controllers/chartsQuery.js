@@ -80,6 +80,8 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             var i=0;
             var sumCases = 0;
             var sumDeaths = 0;
+            var newDeaths; var newCases;
+
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 categoriesArray.push(el._id.date);
 
@@ -90,29 +92,38 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                     deathsArray.push(el.deaths);
                     sumCases = sumCases + el.cases;
                     sumDeaths = sumDeaths + el.deaths;
+                    newCases = el.cases; //imposta nuovo cases
+                    newDeaths = el.deaths; //imposta nuovo deaths
                 }
                 else{
                     //casesArray.push(el.cases - sumCases);
                     
                     var diffDeaths = el.deaths - sumDeaths;
                     var diffCases = el.cases - sumCases;
+            
                     if(diffDeaths < 0){ //Verifica la presenza di dati negativi per deaths
-                        deathsArray.push(0);
-                        deathsArray[i-1] = deathsArray[i-1] + diffDeaths;
+                        deathsArray.push(0); 
+                        newDeaths = 0; //nuove deaths
+                        deathsArray[i-1] = deathsArray[i-1] + diffDeaths; //aggiona deaths giorno precedente
+                        resultArray[i-1].deaths = deathsArray[i-1] + diffDeaths; //aggiorna oggetto resultArray.deaths giorno precedente
                         sumDeaths = sumDeaths + diffDeaths;
                     }
                     else{
                         deathsArray.push(el.deaths - sumDeaths);
+                        newDeaths = (el.deaths - sumDeaths); //aggiorna nuovo deaths
                         sumDeaths = sumDeaths + deathsArray[i];
                     }
 
                     if(diffCases < 0){ //Verifica la presenza di dati negativi per cases
                         casesArray.push(0);
-                        casesArray[i-1] = casesArray[i-1] + diffCases;
+                        newCases = 0; //nuovi cases
+                        casesArray[i-1] = casesArray[i-1] + diffCases; //Aggiorna cases giorno precedente
+                        resultArray[i-1].cases = casesArray[i-1] + diffCases; // aggiorna oggetto resultArray.cases giorno precedente
                         sumCases = sumCases + diffCases;
                     }
                     else{
                         casesArray.push(el.cases - sumCases);
+                        newCases = (el.cases - sumCases); //aggiorna nuovo cases
                         sumCases = sumCases + casesArray[i];
                     }
 
@@ -124,8 +135,8 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                 resultArray.push({
                     state : el._id.state,
                     date : el._id.date,
-                    cases: el.cases,
-                    deaths : el.deaths
+                    cases: newCases,
+                    deaths : newDeaths
                 })
             })
             //console.log("resArray", resArray);
