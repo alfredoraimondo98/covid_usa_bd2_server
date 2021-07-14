@@ -512,7 +512,7 @@ exports.getReportCases = (req, res, next) => {
 
             if(result.length > 0){
                 return res.status(201).json({
-                    report : resultArray
+                    result : resultArray
                 })
             }
             else{
