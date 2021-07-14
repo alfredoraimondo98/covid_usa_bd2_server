@@ -78,6 +78,7 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             var deathsArray = [];
             let resultArray = []; //array dati risposta per la visualizzazione della griglia
             var i=0;
+
             var sumCases = 0;
             var sumDeaths = 0;
             var newDeaths; var newCases;
@@ -383,7 +384,6 @@ exports.getReportCases = (req, res, next) => {
     var dateStart;
     var dateEnd;
 
-
     state = req.body.state;
     county = req.body.county;
     date = new Date(req.body.date); //start ritorna all lockdown date
@@ -406,6 +406,14 @@ exports.getReportCases = (req, res, next) => {
     //console.log("** END ", dateEnd, dateEndFormatted);
 
     
+    let casesArray = [];
+    var deathsArray = [];
+    let resultArray = []; //array dati risposta per la visualizzazione della griglia
+    var i=0;
+    var sumCases = 0;
+    var sumDeaths = 0;
+    var newDeaths; var newCases;
+
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
@@ -414,16 +422,75 @@ exports.getReportCases = (req, res, next) => {
         var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
         var projection = { _id : 0, date : 1, cases : 1, deaths : 1, state: 1, county: 1}
 
-        dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
+        dbo.collection("integrazioneFinale").find(condition).project(projection).sort({date : 1}).toArray(async function(err, result) {
             if(err) throw err;      
             
             db.close();
+
+            //********* Modifica dati casi da aggragati a giornalieri
+
+            result.forEach(el =>{ //Crea oggetto da inviare al frontend
+                //CasesArray contiene i dati dei casi giornalieri
+                //DeathsArray contiene i dati dei morti giornalieri
+                if(i == 0){
+                    casesArray.push(el.cases); 
+                    deathsArray.push(el.deaths);
+                    sumCases = sumCases + el.cases;
+                    sumDeaths = sumDeaths + el.deaths;
+                    newCases = el.cases; //imposta nuovo cases
+                    newDeaths = el.deaths; //imposta nuovo deaths
+                }
+                else{
+                    //casesArray.push(el.cases - sumCases);
+                    
+                    var diffDeaths = el.deaths - sumDeaths;
+                    var diffCases = el.cases - sumCases;
+            
+                    if(diffDeaths < 0){ //Verifica la presenza di dati negativi per deaths
+                        deathsArray.push(0); 
+                        newDeaths = 0; //nuove deaths
+                        deathsArray[i-1] = deathsArray[i-1] + diffDeaths; //aggiona deaths giorno precedente
+                        resultArray[i-1].deaths = deathsArray[i-1] + diffDeaths; //aggiorna oggetto resultArray.deaths giorno precedente
+                        sumDeaths = sumDeaths + diffDeaths;
+                    }
+                    else{
+                        deathsArray.push(el.deaths - sumDeaths);
+                        newDeaths = (el.deaths - sumDeaths); //aggiorna nuovo deaths
+                        sumDeaths = sumDeaths + deathsArray[i];
+                    }
+
+                    if(diffCases < 0){ //Verifica la presenza di dati negativi per cases
+                        casesArray.push(0);
+                        newCases = 0; //nuovi cases
+                        casesArray[i-1] = casesArray[i-1] + diffCases; //Aggiorna cases giorno precedente
+                        resultArray[i-1].cases = casesArray[i-1] + diffCases; // aggiorna oggetto resultArray.cases giorno precedente
+                        sumCases = sumCases + diffCases;
+                    }
+                    else{
+                        casesArray.push(el.cases - sumCases);
+                        newCases = (el.cases - sumCases); //aggiorna nuovo cases
+                        sumCases = sumCases + casesArray[i];
+                    }
+
+                    //sumCases = sumCases + casesArray[i];
+                }
+                i++;
+
+                
+                resultArray.push({
+                    date : el.date,
+                    state : el.state,
+                    county : el.county,
+                    cases: newCases,
+                    deaths : newDeaths
+                })
+            })
 
           //  console.log(result);
 
             if(result.length > 0){
                 return res.status(201).json({
-                    report : result
+                    report : resultArray
                 })
             }
             else{
@@ -539,7 +606,7 @@ exports.getReportAirQuality = (req, res, next) => {
         var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
         var projection = { _id : 0, date : 1, cities_air_quality: 1}
 
-        dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
+        dbo.collection("integrazioneFinale").find(condition).project(projection).sort({date : 1}).toArray(async function(err, result) {
             if(err) throw err;      
             
             db.close();
