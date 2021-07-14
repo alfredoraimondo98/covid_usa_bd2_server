@@ -87,7 +87,8 @@ exports.getCasesAndDeaths = async (req, res, next) => {
                 return res.status(201).json({
                     qf_categories : categoriesArray,
                     qf_cases : casesArray,
-                    qf_deaths : deathsArray
+                    qf_deaths : deathsArray,
+                    result : result
                 })
             }
             else{
