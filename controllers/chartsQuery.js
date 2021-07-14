@@ -715,7 +715,7 @@ exports.getReportAirAverage = (req, res, next) => {
 
                 resultArray.push({
                     state : el._id.state,
-                    county : el._id.counyt,
+                    county : el._id.county,
                     cities_air_quality : {
                         city : el._id.city,
                         air_quality : el.air_average
