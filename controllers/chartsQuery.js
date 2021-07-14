@@ -77,10 +77,30 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             let casesArray = [];
             let deathsArray = [];
             let resultArray = []; //array dati risposta per la visualizzazione della griglia
+            var i=0;
+            var sumCases = 0;
+            var sumDeaths = 0;
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 categoriesArray.push(el._id.date);
-                casesArray.push(el.cases);
-                deathsArray.push(el.deaths);
+
+                //CasesArray contiene i dati dei casi giornalieri
+                //DeathsArray contiene i dati dei morti giornalieri
+                if(i == 0){
+                    casesArray.push(el.cases); 
+                    deathsArray.push(el.deaths);
+                    sumCases = sumCases + el.cases;
+                    sumDeaths = sumDeaths + el.deaths;
+                }
+                else{
+                    casesArray.push(el.cases - sumCases);
+                    deathsArray.push(el.deaths - sumDeaths);
+                    sumCases = sumCases + casesArray[i];
+                    sumDeaths = sumDeaths + deathsArray[i];
+                }
+                i++;
+
+
+
                 resultArray.push({
                     state : el._id.state,
                     date : el._id.date,
