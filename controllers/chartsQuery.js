@@ -76,19 +76,28 @@ exports.getCasesAndDeaths = async (req, res, next) => {
             let categoriesArray = []
             let casesArray = [];
             let deathsArray = [];
+            let resultArray = []; //array dati risposta per la visualizzazione della griglia
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
                 categoriesArray.push(el._id.date);
                 casesArray.push(el.cases);
                 deathsArray.push(el.deaths);
+                resultArray.push({
+                    state : el._id.state,
+                    date : el._id.date,
+                    cases: el.cases,
+                    deaths : el.deaths
+                })
             })
             //console.log("resArray", resArray);
+
+            
 
             if(categoriesArray.length > 0){ 
                 return res.status(201).json({
                     qf_categories : categoriesArray,
                     qf_cases : casesArray,
                     qf_deaths : deathsArray,
-                    result : result
+                    result : resultArray
                 })
             }
             else{
