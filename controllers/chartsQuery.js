@@ -417,13 +417,13 @@ exports.getReportCases = (req, res, next) => {
     console.log(date);
 
     dateStart = new Date(req.body.date);
-    dateStart.setDate(date.getDate() - 15);
+    dateStart.setDate(date.getDate() - 30);
     dateStartFormatted = dateFormat(dateStart, "yyyy-mm-dd");
     //console.log("** START", dateStart, dateStartFormatted);
 
     //console.log("**** ", date);
     dateEnd = new Date(req.body.date);
-    dateEnd.setDate(date.getDate() + 15);
+    dateEnd.setDate(date.getDate() + 30);
     dateEndFormatted = dateFormat(dateEnd, "yyyy-mm-dd");
     //console.log("** END ", dateEnd, dateEndFormatted);
 
