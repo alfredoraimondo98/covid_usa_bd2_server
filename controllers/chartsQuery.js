@@ -454,10 +454,23 @@ exports.getReportCases = (req, res, next) => {
 
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
 
-                categories.push(el.date)
+                categories.push(el.date);
+
+                //Dati incrementali
+                casesArray.push(el.cases);
+                deathsArray.push(el.deaths);
+                resultArray.push({
+                    date : el.date,
+                    state : el.state,
+                    county : el.county,
+                    cases: el.cases,
+                    deaths : el.deaths
+                })
 
                 //CasesArray contiene i dati dei casi giornalieri
                 //DeathsArray contiene i dati dei morti giornalieri
+                /*DATI GIORNALIERI */
+                /*
                 if(i == 0){
                     casesArray.push(el.cases); 
                     deathsArray.push(el.deaths);
@@ -501,7 +514,7 @@ exports.getReportCases = (req, res, next) => {
                     //sumCases = sumCases + casesArray[i];
                 }
                 i++;
-
+                
                 
                 resultArray.push({
                     date : el.date,
@@ -510,6 +523,7 @@ exports.getReportCases = (req, res, next) => {
                     cases: newCases,
                     deaths : newDeaths
                 })
+                */
             })
 
           //  console.log(result);
