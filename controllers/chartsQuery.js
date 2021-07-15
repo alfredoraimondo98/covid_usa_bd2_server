@@ -436,6 +436,7 @@ exports.getReportCases = (req, res, next) => {
     var sumDeaths = 0;
     var newDeaths; var newCases;
 
+    var categories = [];
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
@@ -452,6 +453,9 @@ exports.getReportCases = (req, res, next) => {
             //********* Modifica dati casi da aggragati a giornalieri
 
             result.forEach(el =>{ //Crea oggetto da inviare al frontend
+
+                categories.push(el.date)
+
                 //CasesArray contiene i dati dei casi giornalieri
                 //DeathsArray contiene i dati dei morti giornalieri
                 if(i == 0){
@@ -512,6 +516,9 @@ exports.getReportCases = (req, res, next) => {
 
             if(result.length > 0){
                 return res.status(201).json({
+                    qf_categories : categories,
+                    qf_cases : casesArray,
+                    qf_deaths : deathsArray,
                     result : resultArray
                 })
             }
