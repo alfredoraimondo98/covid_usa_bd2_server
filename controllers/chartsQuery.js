@@ -655,8 +655,8 @@ exports.getReportAirQuality = (req, res, next) => {
             })
             if(result.length > 0){
                 return res.status(201).json({
-                    categories : categories,
-                    airQuality : airQuality,
+                    qf_categories : categories,
+                    qf_air_quality : airQuality,
                     result : resultArray
                 })
             }
