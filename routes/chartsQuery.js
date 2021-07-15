@@ -19,5 +19,7 @@ router.post('/getReportAirAverage', chartsQueryController.getReportAirAverage); 
 
 router.post('/getPercentCasesByState', chartsQueryController.getPercentCasesByState); //restituisce valori di casi totali per tutte le contee di uno stato
 
+router.post('/getStateWithAirQuality', chartsQueryController.getStateWithAirQuality); //restituisce stati con informazioni della qualità dell'aria
+
 
 module.exports = router;

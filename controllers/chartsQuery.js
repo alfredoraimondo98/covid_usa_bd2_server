@@ -881,3 +881,58 @@ exports.getPercentCasesByState = (req, res, next) => {
         })
     });
 }
+
+
+/**
+ * restituisce stati per i quali è prensete l'informazioni cities_air_quality
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.getStateWithAirQuality = (req, res, next) => {
+
+    var condition = { state : {"$exists" : true}, cities_air_quality : {"$exists" : true} };
+    var projection = { _id : 0, state : 1}
+    var projGroup = {"state" : "$state", "cities_air_quality" : "$cities_air_quality"};
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+
+        console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
+
+
+        dbo.collection("integrazioneFinale").aggregate([
+
+            {
+                "$match" :  condition  //find() 
+            },
+            {
+                "$project" : projection //project()
+            },
+            {
+                "$group": { //groupby
+                    "_id": projGroup
+                }
+            }
+        ]).sort({_id : 1}).toArray(async function(err, result) {
+            if(err) throw err;
+            console.log(result);
+
+            db.close();
+
+            arrayState = []
+            result.forEach( el => {
+                arrayState.push(el._id.state)
+            }) 
+
+
+            return res.status(201).json({
+                state : arrayState
+            })
+        });
+    })
+}
+
+
