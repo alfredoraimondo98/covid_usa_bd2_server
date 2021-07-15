@@ -848,7 +848,7 @@ exports.getPercentCasesByState = (req, res, next) => {
                         resolve({
                             state : state,
                             county : elCounty,
-                            totalCases: result2[0].cases}); //crea un array di tutte le entry che matchano la query
+                            cases: result2[0].cases}); //crea un array di tutte le entry che matchano la query
                     })
                 })
             }
