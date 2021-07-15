@@ -936,3 +936,125 @@ exports.getStateWithAirQuality = (req, res, next) => {
 }
 
 
+/**
+ * restituisce la media della qualità dell'aria per tutte le città
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.getAvgQoACity = (req, res, next)=> {
+
+    var condition = {cities_air_quality : {$exists : true}}
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+
+        //console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
+
+        dbo.collection("integrazioneFinale").aggregate([
+
+            {
+                "$match" :  condition  //find() 
+            },
+            /*{
+                "$project" : projection //project()
+            }, */
+            {$unwind: "$cities_air_quality"}, //destruttura l'array cities_air_quality
+            {
+                "$group": { //groupby
+                    "_id" : {"state" : "$state", "county" : "$county", "city" : "$cities_air_quality.city"}, air_average: { $avg: "$cities_air_quality.air_quality" }}
+                
+            }
+        ]).sort({_id : 1}).toArray(async function(err, result) {
+            if(err) throw err;
+            console.log(result);
+
+            db.close();
+
+            var data = []; //Array dati formattati per il grafo
+            var resultArray = [];
+            result.forEach(el => {
+                data.push({
+                    name : el._id.city,
+                    y : el.air_average
+                })
+
+                resultArray.push({
+                    state : el._id.state,
+                    county : el._id.county,
+                    cities_air_quality : {
+                        city : el._id.city,
+                        air_quality : el.air_average
+                    }
+                })
+
+            })
+
+            if(result.length > 0){ 
+                return res.status(201).json({
+                    data : data,
+                    result : resultArray
+                })
+            }
+            else{
+                return res.status(204).json({})
+            } 
+        }); 
+    })
+}
+
+
+/**
+ * restituisce tutte le città presenti (per i dati della qualità dell'aria)
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.getCity = (req, res, next) => {
+
+    var condition = { state : {"$exists" : true}, cities_air_quality : {"$exists" : true} };
+    var projection = { _id : 0, "cities_air_quality.city" : 1}
+    var projGroup = {"state" : "$state", "cities_air_quality" : "$cities_air_quality"};
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+
+        console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
+
+
+        dbo.collection("integrazioneFinale").aggregate([
+
+            {
+                "$match" :  condition  //find() 
+            },
+            {
+                "$project" : projection //project()
+            },
+            {$unwind: "$cities_air_quality"}, //destruttura l'array cities_air_quality
+            {
+                "$group": { //groupby
+                    "_id" : {"state" : "$state", "county" : "$county", "city" : "$cities_air_quality.city"}
+                }
+                
+            }
+        ]).sort({_id : 1}).toArray(async function(err, result) {
+            if(err) throw err;
+            console.log(result);
+
+            db.close();
+
+            arrayCities = []
+            result.forEach( el => {
+                arrayCities.push(el._id.city)
+            }) 
+
+
+            return res.status(201).json({
+                city : arrayCities
+            })
+        });
+    })
+}
