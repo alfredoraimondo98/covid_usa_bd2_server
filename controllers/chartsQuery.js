@@ -853,7 +853,7 @@ exports.getPercentCasesByState = (req, res, next) => {
                 })
             }
     
-            db.close();
+            //db.close();
     
             var action = arrayCounty.map(risultatoPromise); //itera la funzione getData per ogni elemento di Lockdown_us
             var resultArray = await Promise.all(action); //risolve le promise
