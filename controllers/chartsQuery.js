@@ -802,11 +802,9 @@ exports.getReportAirAverage = (req, res, next) => {
  */
 exports.getPercentCasesByState = (req, res, next) => {
 
-    var state = "Florida";
-
+    var state = req.body.state;
 
     var condition = {"state" : state};
-    var projection = {};
 
     arrayCounty = [];
     var risultatoPromise;
@@ -820,9 +818,6 @@ exports.getPercentCasesByState = (req, res, next) => {
             {
                 "$match" :  condition  //find() 
             },
-            /*{
-                "$project" : projection //project()
-            }, */
             {
                 "$group": { //groupby
                     "_id" : {"state" : "$state", "county" : "$county"}}
@@ -837,7 +832,7 @@ exports.getPercentCasesByState = (req, res, next) => {
                     arrayCounty.push(el._id.county);
                 }
             })
-            console.log("**** ", arrayCounty )
+            //console.log("**** ", arrayCounty )
 
             
        
@@ -861,23 +856,22 @@ exports.getPercentCasesByState = (req, res, next) => {
             db.close();
     
             var action = arrayCounty.map(risultatoPromise); //itera la funzione getData per ogni elemento di Lockdown_us
-            var res = await Promise.all(action); //risolve le promise
-            console.log("*** res ", res);
+            var resultArray = await Promise.all(action); //risolve le promise
+            console.log("*** res ", resultArray);
 
             data = [];
 
-            res.forEach(el => {
+            resultArray.forEach(el => {
                 data.push({
                     name : el.county,
                     y : el.totalCases
                 })
             })
 
-            return res.status(201).json({
+            return resultArray.status(201).json({
                 data : data,
                 result : res
             })
-        
         })
     });
 }
