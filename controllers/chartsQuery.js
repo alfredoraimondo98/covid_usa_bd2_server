@@ -625,7 +625,7 @@ exports.getReportAirQuality = (req, res, next) => {
         if (err) throw err;
         var dbo = db.db("basi2");
 
-        var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
+        var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}, cities_air_quality : {$exists : true}};
         var projection = { _id : 0, state : 1, county : 1, date : 1, cities_air_quality: 1}
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).sort({date : 1}).toArray(async function(err, result) {
