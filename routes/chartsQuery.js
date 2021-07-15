@@ -25,5 +25,8 @@ router.post('/getAvgQoACity', chartsQueryController.getAvgQoACity); //restituisc
 
 router.post('/getCity', chartsQueryController.getCity); //restituisce tutte le città
 
+router.post('/getReportQoAByCity', chartsQueryController.getReportQoAByCity); //restituisce report qualità dell'aria per città
+
+
 
 module.exports = router;

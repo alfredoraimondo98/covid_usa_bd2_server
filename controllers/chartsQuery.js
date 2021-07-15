@@ -1058,3 +1058,103 @@ exports.getCity = (req, res, next) => {
         });
     })
 }
+
+
+exports.getReportQoAByCity = (req, res, next) => {
+
+    var city;
+    var byDataInizio;
+    var byDataFine;
+
+    city = req.body.city;
+    byDataInizio = req.body.byDataInizio;
+    byDataFine = req.body.byDataFine;
+
+    
+    //Verifica condizioni query
+    var condition={};
+
+    if(city){ //verifica state
+        condition['cities_air_quality.city'] = city;
+    }
+
+    //Verifica la presenza del range temporale (data inzio - data fine)
+    if(byDataInizio != '' && byDataFine != ''){
+
+        //costruisce data precedente a quella richiesta
+        var dateYesterday = new Date(byDataInizio);
+            dateYesterday.setDate(dateYesterday.getDate());
+            dateYesterday = dateFormat(dateYesterday , "yyyy-mm-dd");
+            byDataInizio = dateYesterday; //aggiona bydataInizio alla data precedente (yesterday)
+            
+
+        condition['date'] = {
+                $gte : byDataInizio,
+                $lte : byDataFine
+        }
+    }
+    else{ 
+        if(byDataInizio != ''){
+            //costruisce data precedente a quella richiesta
+            var dateYesterday = new Date(byDataInizio);
+            dateYesterday.setDate(dateYesterday.getDate() - 1);
+            dateYesterday = dateFormat(dateYesterday , "yyyy-mm-dd");
+            byDataInizio = dateYesterday; //aggiona bydataInizio alla data precedente (yesterday)
+             
+            condition['date'] = {"$gte" : byDataInizio};
+        }
+        else if(byDataFine != ''){
+                condition['date'] = {"$lte" : byDataFine};
+        }
+    }
+
+    var projection = {"_id" : 0, "date" : 1, "state" : 1, "county": 1, "cities_air_quality" : 1};
+    //var projGroup = { "_id" : {"state" : "$state", "date" : "$date"}, cases: { $sum: "$cases" }, deaths: { $sum: "$deaths" }};
+
+   
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+
+
+        //console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
+
+        dbo.collection("integrazioneFinale").aggregate([
+            {$unwind: "$cities_air_quality"}, //destruttura l'array cities_air_quality
+            {
+                "$match" :  condition  //find() 
+            },
+            {
+                "$project" : projection //project()
+            },
+           
+        ]).sort({date : 1}).toArray(async function(err, result) {
+            if(err) throw err;
+            console.log(result);
+
+            db.close();
+        
+            var categories = [];
+            var air_quality = [];
+            var resultArray = [];
+
+            result.forEach( el => {
+                categories.push(el.date);
+                air_quality.push(el.cities_air_quality.air_quality);
+            })
+
+
+            if(result.length > 0){ 
+                return res.status(201).json({
+                    qf_categories : categories,
+                    qf_air_quality : air_quality,
+                    result : resultArray
+                })
+            }
+            else{
+                return res.status(204).json({})
+            }
+        });
+    })
+}
