@@ -626,7 +626,7 @@ exports.getReportAirQuality = (req, res, next) => {
         var dbo = db.db("basi2");
 
         var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
-        var projection = { _id : 0, date : 1, cities_air_quality: 1}
+        var projection = { _id : 0, state : 1, county : 1, date : 1, cities_air_quality: 1}
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).sort({date : 1}).toArray(async function(err, result) {
             if(err) throw err;      
@@ -636,15 +636,28 @@ exports.getReportAirQuality = (req, res, next) => {
             console.log(result);
             categories = [];
             airQuality = [];
+            resultArray = [];
 
             result.forEach(el => {
                 categories.push(el.date)
                 airQuality.push(el.cities_air_quality[0].air_quality);
+
+                resultArray.push({
+                    state : el.state,
+                    county : el.county,
+                    date : el.date,
+                    cities_air_quality : {
+                        city : el.cities_air_quality[0].city,
+                        air_quality : el.cities_air_quality[0].air_quality
+                    }
+                })
+
             })
             if(result.length > 0){
                 return res.status(201).json({
                     categories : categories,
-                    airQuality : airQuality
+                    airQuality : airQuality,
+                    result : resultArray
                 })
             }
             else{
