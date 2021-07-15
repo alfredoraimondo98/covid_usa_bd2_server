@@ -864,7 +864,7 @@ exports.getPercentCasesByState = (req, res, next) => {
             resultArray.forEach(el => {
                 data.push({
                     name : el.county,
-                    y : el.totalCases
+                    y : el.cases
                 })
             })
 
