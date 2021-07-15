@@ -1072,11 +1072,9 @@ exports.getReportQoAByCity = (req, res, next) => {
 
     
     //Verifica condizioni query
-    var condition={};
+    var condition={"cities_air_quality.city" : city};
 
-    if(city){ //verifica state
-        condition['cities_air_quality.city'] = city;
-    }
+   
 
     //Verifica la presenza del range temporale (data inzio - data fine)
     if(byDataInizio != '' && byDataFine != ''){
@@ -1137,8 +1135,7 @@ exports.getReportQoAByCity = (req, res, next) => {
         
             var categories = [];
             var air_quality = [];
-            var resultArray = [];
-
+ 
             result.forEach( el => {
                 categories.push(el.date);
                 air_quality.push(el.cities_air_quality.air_quality);
@@ -1149,7 +1146,7 @@ exports.getReportQoAByCity = (req, res, next) => {
                 return res.status(201).json({
                     qf_categories : categories,
                     qf_air_quality : air_quality,
-                    result : resultArray
+                    result : result
                 })
             }
             else{
