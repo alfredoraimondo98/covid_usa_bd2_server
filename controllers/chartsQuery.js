@@ -792,3 +792,92 @@ exports.getReportAirAverage = (req, res, next) => {
         }); 
     })
 }
+
+
+/**
+ * restituisce totale dei casi (cases) covid per tutte le contee di un dato stato
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.getPercentCasesByState = (req, res, next) => {
+
+    var state = "Florida";
+
+
+    var condition = {"state" : state};
+    var projection = {};
+
+    arrayCounty = [];
+    var risultatoPromise;
+
+    MongoClient.connect(url, async function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("basi2");
+    
+        dbo.collection("integrazioneFinale").aggregate([
+
+            {
+                "$match" :  condition  //find() 
+            },
+            /*{
+                "$project" : projection //project()
+            }, */
+            {
+                "$group": { //groupby
+                    "_id" : {"state" : "$state", "county" : "$county"}}
+                
+            }
+        ]).sort({_id : 1}).toArray(async function(err, result) {
+            if(err) throw err;
+           // console.log(result);
+
+            result.forEach(el =>{
+                if(el._id.county != null){
+                    arrayCounty.push(el._id.county);
+                }
+            })
+            console.log("**** ", arrayCounty )
+
+            
+       
+            risultatoPromise = await function getData(elCounty){ 
+
+                return new Promise (resolve => { 
+                   // console.log("** PROMISE IN", elCounty, state)
+                    var query = { "state" : state, "county" : elCounty } //tutte le entry per una certa data e che matchano per stato o per county
+                    dbo.collection("integrazioneFinale").find(query).sort({date : -1}).toArray( async function (err, result2) {
+                        if(err) throw err;
+                        //console.log("result query ", result2)
+                        
+                        resolve({
+                            state : state,
+                            county : elCounty,
+                            totalCases: result2[0].cases}); //crea un array di tutte le entry che matchano la query
+                    })
+                })
+            }
+    
+            db.close();
+    
+            var action = arrayCounty.map(risultatoPromise); //itera la funzione getData per ogni elemento di Lockdown_us
+            var res = await Promise.all(action); //risolve le promise
+            console.log("*** res ", res);
+
+            data = [];
+
+            res.forEach(el => {
+                data.push({
+                    name : el.county,
+                    y : el.totalCases
+                })
+            })
+
+            return res.status(201).json({
+                data : data,
+                result : res
+            })
+        
+        })
+    });
+}
