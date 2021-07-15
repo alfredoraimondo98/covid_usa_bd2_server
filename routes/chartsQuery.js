@@ -21,5 +21,7 @@ router.post('/getPercentCasesByState', chartsQueryController.getPercentCasesBySt
 
 router.post('/getStateWithAirQuality', chartsQueryController.getStateWithAirQuality); //restituisce stati con informazioni della qualità dell'aria
 
+router.post('/getAvgQoACity', chartsQueryController.getAvgQoACity); //restituisce la media della qualità dell'aria per tutte le città di un dato stato
+
 
 module.exports = router;
