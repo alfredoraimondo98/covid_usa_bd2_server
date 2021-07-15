@@ -868,10 +868,16 @@ exports.getPercentCasesByState = (req, res, next) => {
                 })
             })
 
-            return resultArray.status(201).json({
-                data : data,
-                result : res
-            })
+            if(resultArray.length > 0){
+                return res.status(201).json({
+                    data : data,
+                    result : resultArray
+                })
+            }
+            else{
+                return res.status(204).json({})
+            }
+            
         })
     });
 }
