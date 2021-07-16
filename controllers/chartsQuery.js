@@ -59,12 +59,18 @@ exports.getCasesAndDeaths = async (req, res, next) => {
     var projection = {"state" : 1, "date" : 1, "cases" : 1 , "deaths" : 1};
     //var projGroup = { "_id" : {"state" : "$state", "date" : "$date"}, cases: { $sum: "$cases" }, deaths: { $sum: "$deaths" }};
 
-   
 
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
         var dbo = db.db("basi2");
 
+        //****CREAZIONE INDICE */ 
+        dbo.collection("integrazioneFinale").indexExists("state_1_date_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "date" : 1, "cities_air_quality" : 1})
+            }
+        })
 
         //console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
@@ -183,160 +189,6 @@ exports.getCasesAndDeaths = async (req, res, next) => {
 
 
 
-/**DA RIVEDEREEEEE  */
-exports.getCasesTwoStates = (req, res, next) => {
-
-    var state1;
-    var state2
-    var byDataInizio;
-    var byDataFine;
-
-    state1 = req.body.state1;
-    state2 = req.body.state2;
-    byDataInizio = req.body.byDataInizio;
-    byDataFine = req.body.byDataFine;
-
-    //Verifica condizioni query
-    var condition={};
-
-    if(state1){ //verifica state
-        condition['state'] = state1;
-    }
-
-    //Verifica la presenza del range temporale (data inzio - data fine)
-    if(byDataInizio != '' && byDataFine != ''){
-        condition['date'] = {
-                $gte : byDataInizio,
-                $lte : byDataFine
-        }
-    }
-    else{ 
-        if(byDataInizio != ''){
-            condition['date'] = byDataInizio;
-        }
-        else if(byDataFine != ''){
-                condition['date'] = byDataFine;
-        }
-    }
-
-    var projection = {"state" : 1, "date" : 1, "cases" : 1 };
-    var projGroup = { "state" : "$state", "date" : "$date", cases: { $sum: "$cases" }};
-
-    var categoriesArray = []
-    var casesArray = [];
-
-    MongoClient.connect(url, async function(err, db) {
-        if (err) throw err;
-        var dbo = db.db("basi2");
-
-
-        console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
-
-
-        //query stato 1
-        dbo.collection("integrazioneFinale").aggregate([
-
-            {
-                "$match" :  condition  //find() 
-            },
-            {
-                "$project" : projection //project()
-            },
-            {
-                "$group": { //groupby
-                    "_id": projGroup
-                }
-            }
-        ]).sort({_id : 1}).toArray(async function(err, result) {
-            if(err) throw err;
-           // console.log(result);
-
-            //db.close();
-        
-            
-            result.forEach(el =>{ //Crea oggetto da inviare al frontend
-                categoriesArray.push(el._id.date);
-                casesArray.push(el._id.cases);
-            })
-            //console.log("resArray", resArray);
-
-            
-        });
-    
-
-
-
-    //query stato 2
-    
-    if(state2){ //verifica state
-        condition['state'] = state2;
-    }
-    var categoriesArray2 = []
-    var casesArray2 = [];
-    dbo.collection("integrazioneFinale").aggregate([
-
-        {
-            "$match" :  condition  //find() 
-        },
-        {
-            "$project" : projection //project()
-        },
-        {
-            "$group": { //groupby
-                "_id": projGroup
-            }
-        }
-    ]).sort({_id : 1}).toArray(async function(err, result) {
-        if(err) throw err;
-      //  console.log(result);
-
-        db.close();
-
-
-        result.forEach(el =>{ //Crea oggetto da inviare al frontend
-            categoriesArray2.push(el._id.date);
-            casesArray2.push(el._id.cases);
-        })
-        //console.log("resArray", resArray);
-       
-     
-        var date1 = new Date(categoriesArray[0]);
-        var date2 = new Date(categoriesArray2[0]);
-        var x = Math.abs(date1 - date2)/(1000*3600*24);
-        var arrayAggiunta = [];
-        
-        for(var i = 0 ; i < x ; i++){
-            arrayAggiunta.push(0)
-        }
-        
-        if(date1 > date2){
-            Array.prototype.push.apply(arrayAggiunta, casesArray);
-            casesArray = arrayAggiunta;
-        }
-        else{
-            Array.prototype.push.apply(arrayAggiunta, casesArray2);
-            casesArray2 = arrayAggiunta;
-        }
-
-        console.log(" *** DIM ", categoriesArray2.length, categoriesArray.length)
-        if(categoriesArray.length > 0 || categoriesArray2 > 0){ 
-            return res.status(201).json({
-                categories : categoriesArray,
-                cases : casesArray,
-                categories2 : categoriesArray2,
-                cases2 : casesArray2
-            })
-        }
-        else{
-            return res.status(204).json({})
-        }
-        
-    });
-})
-    
-}
-
-
 /**
  * restituisce i lockdown dello stato passato come parametro
  * @param {*} req 
@@ -354,7 +206,15 @@ exports.getLockdown = (req, res, next) => {
         var dbo = db.db("basi2");
 
         var condition = {"state" : state, "lockdown" : {$exists : true} };
-        var projection = { _id : 0, date : 1, lockdown : 1, county: 1}
+        var projection = { _id : 0, date : 1, lockdown : 1, county: 1};
+
+        //****CREAZIONE INDICE */ 
+        dbo.collection("integrazioneFinale").indexExists("state_1_lockdown_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "lockdown" : 1})
+            }
+        })
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).toArray(async function(err, result) {
             if(err) throw err;      
@@ -444,6 +304,14 @@ exports.getReportCases = (req, res, next) => {
 
         var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}};
         var projection = { _id : 0, date : 1, cases : 1, deaths : 1, state: 1, county: 1}
+
+         //****CREAZIONE INDICE */ 
+         dbo.collection("integrazioneFinale").indexExists("state_1_county_1_date_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "county" : 1, "date" : 1, "cities_air_quality" : 1})
+            }
+        })
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).sort({date : 1}).toArray(async function(err, result) {
             if(err) throw err;      
@@ -561,6 +429,15 @@ exports.getReportCases = (req, res, next) => {
         if (err) throw err;
         var dbo = db.db("basi2");
 
+         //****CREAZIONE INDICE */ 
+         dbo.collection("integrazioneFinale").indexExists("state_1_lockdown_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "lockdown" : 1})
+            }
+        })
+        
+
 
         console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
@@ -646,8 +523,17 @@ exports.getReportAirQuality = (req, res, next) => {
         if (err) throw err;
         var dbo = db.db("basi2");
 
-        var condition = {"state" : state, "county": county, date : {$gte : dateStartFormatted , $lte : dateEndFormatted}, cities_air_quality : {$exists : true}};
+        var condition = {"state" : state, "county": county, "date" : {$gte : dateStartFormatted , $lte : dateEndFormatted}, cities_air_quality : {$exists : true}};
         var projection = { _id : 0, state : 1, county : 1, date : 1, cities_air_quality: 1}
+
+
+         //****CREAZIONE INDICE */ 
+         dbo.collection("integrazioneFinale").indexExists("state_1_county_1_date_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "county" : 1, "date" : 1, "cities_air_quality" : 1})
+            }
+        })
 
         dbo.collection("integrazioneFinale").find(condition).project(projection).sort({date : 1}).toArray(async function(err, result) {
             if(err) throw err;      
@@ -739,6 +625,14 @@ exports.getReportAirAverage = (req, res, next) => {
         var dbo = db.db("basi2");
 
 
+        //****CREAZIONE INDICE */ 
+        dbo.collection("integrazioneFinale").indexExists("state_1_date_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "date" : 1, "cities_air_quality" : 1})
+            }
+        })
+
         //console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
         dbo.collection("integrazioneFinale").aggregate([
@@ -812,6 +706,15 @@ exports.getPercentCasesByState = (req, res, next) => {
     MongoClient.connect(url, async function(err, db) {
         if (err) throw err;
         var dbo = db.db("basi2");
+
+        
+        //****CREAZIONE INDICE */ 
+        dbo.collection("integrazioneFinale").indexExists("state_1_county_1_date_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "county" : 1, "date" : 1, "cities_air_quality" : 1})
+            }
+        })
     
         dbo.collection("integrazioneFinale").aggregate([
 
@@ -899,6 +802,13 @@ exports.getStateWithAirQuality = (req, res, next) => {
         if (err) throw err;
         var dbo = db.db("basi2");
 
+          //****CREAZIONE INDICE */ 
+          dbo.collection("integrazioneFinale").indexExists("state_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "cities_air_quality" : 1})
+            }
+        })
 
         console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
@@ -950,6 +860,13 @@ exports.getAvgQoACity = (req, res, next)=> {
         var dbo = db.db("basi2");
 
 
+          //****CREAZIONE INDICE */ 
+          dbo.collection("integrazioneFinale").indexExists("cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"cities_air_quality" : 1})
+            }
+        })
         //console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
         dbo.collection("integrazioneFinale").aggregate([
@@ -1021,6 +938,13 @@ exports.getCity = (req, res, next) => {
         if (err) throw err;
         var dbo = db.db("basi2");
 
+          //****CREAZIONE INDICE */ 
+          dbo.collection("integrazioneFinale").indexExists("state_1_cities_air_quality_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"state" : 1, "cities_air_quality" : 1})
+            }
+        })
 
         console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
@@ -1073,7 +997,6 @@ exports.getReportQoAByCity = (req, res, next) => {
     
     //Verifica condizioni query
     var condition={"cities_air_quality.city" : city};
-
    
 
     //Verifica la presenza del range temporale (data inzio - data fine)
@@ -1116,6 +1039,17 @@ exports.getReportQoAByCity = (req, res, next) => {
         var dbo = db.db("basi2");
 
 
+        //****CREAZIONE INDICE */
+        dbo.collection("integrazioneFinale").indexExists("cities_air_quality.city_1_date_1", (err, res) => { //res = false (non esiste) |true (già esiste l'indice)
+            console.log("***", err, res)
+            if(!res){
+                dbo.collection("integrazioneFinale").createIndex({"cities_air_quality.city" : 1, "date" : 1})
+            }
+        })
+        
+
+
+
         //console.log("***QUERY: ", "$match (find):", condition , "\n project: ", projGroup, "\n group : {group : { _id : ", projGroup, "}} **" )
 
         dbo.collection("integrazioneFinale").aggregate([
@@ -1129,7 +1063,7 @@ exports.getReportQoAByCity = (req, res, next) => {
            
         ]).sort({date : 1}).toArray(async function(err, result) {
             if(err) throw err;
-            console.log(result);
+            //console.log(result);
 
             db.close();
         

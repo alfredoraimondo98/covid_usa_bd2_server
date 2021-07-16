@@ -5,8 +5,6 @@ const chartsQueryController = require("../controllers/chartsQuery");
 
 router.post('/getCasesAndDeaths', chartsQueryController.getCasesAndDeaths); //restituisce casi e morti in un range di date per un dato stato
 
-router.post('/getCasesTwoStates', chartsQueryController.getCasesTwoStates); //NOT FOUND
-
 router.post('/getLockdown', chartsQueryController.getLockdown); //restituisce tutti gli stati per cui è presente l'informazione lockdown
 
 router.post('/getReportCases', chartsQueryController.getReportCases); //restituisce un report dei casi (e morti) per un dato stato pre/post lockdown
